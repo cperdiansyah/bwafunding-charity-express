@@ -13,6 +13,7 @@
   "author": "cperdiansyah",
   "license": "ISC",
   "dependencies": {
+    "bcrypt-ts": "^3.0.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
