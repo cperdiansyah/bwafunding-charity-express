@@ -65,21 +65,32 @@ export const logout = async (req: Request, res: Response) => {
   if (!refreshToken) return res.sendStatus(204)
   res.clearCookie('refreshToken')
   // return res.json(req.cookies)
-  return res.sendStatus(200).redirect('/')
+  // return res.sendStatus(200).redirect('/')
+  return res.status(200).json({
+    status: 'success',
+    message: 'user logged out',
+  })
 }
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body
-    const user = await User.findOne({ email })
-
+    const { name, email, password, username } = req.body
+    const user = await User.findOne({
+      $or: [{ username: username }, { email: email }],
+    })
     if (user) {
       return res.status(400).json({
+        code: 400,
         massage: 'User already exists',
       })
     }
     const hashPassword = await hashSync(password, genSaltSync(10))
-    const newUser = await User.create({ name, email, password: hashPassword })
+    const newUser = await User.create({
+      name,
+      email,
+      username,
+      password: hashPassword,
+    })
 
     const userData = {
       id: newUser._id,
@@ -109,6 +120,12 @@ export const register = async (req: Request, res: Response) => {
       accessToken,
     })
   } catch (err) {
-    console.log(err)
+    // console.log(err)
+    return res.status(400).json({
+      error: {
+        code: 400,
+        massage: err,
+      },
+    })
   }
 }

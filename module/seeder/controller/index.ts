@@ -16,25 +16,32 @@ export const importData = async (req: Request, res: Response) => {
     })
 
     console.log('Data Imported...')
-    process.exit(0)
+    // process.exit(0)
   } catch (error) {
     console.log('Error: ', error)
     res.status(400).json({
-      status: 'fai;',
-      message: 'Import failed',
+      status: 'fail',
+      message: 'Import data failed',
     })
-    process.exit()
+    // process.exit()
   }
 }
 
-export const destroyData = async () => {
+export const destroyData = async (req: Request, res: Response) => {
   try {
     await User.deleteMany({})
-
+    res.status(200).json({
+      status: 'success',
+      message: 'Data Destroyed',
+    })
     console.log('Data Destroyed...')
-    process.exit(0)
+    // process.exit(0)
   } catch (error) {
     console.log('Error: ', error)
-    process.exit()
+    res.status(400).json({
+      status: 'fail',
+      message: 'Destroy data failed',
+    })
+    // process.exit()
   }
 }
