@@ -10,10 +10,19 @@ import {
   REFRESH_TOKEN_SECRET,
   JWT_COOKIE_EXPIRES_IN_MS,
 } from '../../../utils'
+import { isEmail } from '../../../utils/helpers'
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body
-  const user = await User.findOne({ email })
+  let user
+  if (isEmail(email)) {
+    // Check user login with email
+    user = await User.findOne({ email })
+  } else {
+    // Check user login with password
+    user = await User.findOne({ username: email })
+  }
+
   if (!user) {
     return res.status(404).json({
       error: {
@@ -56,6 +65,8 @@ export const login = async (req: Request, res: Response) => {
     })
     .json({
       name: user.name,
+      email: user.email,
+      role: user.role,
       accessToken,
     })
 }
@@ -117,6 +128,8 @@ export const register = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
       accessToken,
     })
   } catch (err) {
