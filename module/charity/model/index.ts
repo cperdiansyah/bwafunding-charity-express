@@ -1,7 +1,6 @@
 import mongoose, { Schema } from 'mongoose'
 import { ICharity, ICharityMedia } from './charityInterface'
 
-
 const media: Schema<ICharityMedia> = new mongoose.Schema({
   content: {
     type: String,
@@ -55,7 +54,8 @@ const charitySchema: Schema<ICharity> = new mongoose.Schema(
     },
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      required: [true, 'author is required'],
+      required: false,
+      // required: [true, 'author is required'],
       ref: 'User',
     },
     media: {
@@ -65,7 +65,6 @@ const charitySchema: Schema<ICharity> = new mongoose.Schema(
   },
   { timestamps: true }
 )
-
 
 const Charity = mongoose.model<ICharity>('Charity', charitySchema)
 
