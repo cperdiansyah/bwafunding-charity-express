@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import Charity from '../model'
 import { ICharity } from '../model/charityInterface'
 import { errorHandler } from '../../../utils/helpers/errorHandler'
+import { slugify } from '../../../utils/helpers/slug'
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity
@@ -53,6 +54,35 @@ export const getCharityById = async (
     }
     return res.status(200).json({
       charity: charity,
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
+// desc create charity
+// @route POST /api/v1/charity/
+// @access Private
+export const crateCharity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      title,
+      description,
+      donation_target,
+      start_date,
+      end_date,
+      author,
+    } = req.body
+    // const authorId = req?.user?.id
+
+    return res.status(200).json({
+      status: 'success',
+      content: slugify(title),
+      // author : authorId
     })
   } catch (error) {
     return errorHandler(error, res)

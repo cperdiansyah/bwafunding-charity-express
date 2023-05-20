@@ -22,6 +22,14 @@ const charitySchema: Schema<ICharity> = new mongoose.Schema(
     slug: {
       type: String,
       required: [true, 'slug is required'],
+      unique: true,
+      validate: {
+        validator: async function (slug: string) {
+          const charity = await Charity.findOne({ slug })
+          return !charity
+        },
+        message: 'slug already exists.',
+      },
     },
     description: {
       type: String,
