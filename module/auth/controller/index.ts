@@ -41,6 +41,7 @@ export const login = async (req: Request, res: Response) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    is_verified: user.is_verified,
   }
 
   const accessToken = jwt.sign(userData, JWT_SECRET, {
@@ -102,7 +103,7 @@ export const register = async (req: Request, res: Response) => {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
-      isAdmin: false,
+      is_verified: newUser.is_verified,
     }
 
     const accessToken = jwt.sign(userData, JWT_SECRET, {

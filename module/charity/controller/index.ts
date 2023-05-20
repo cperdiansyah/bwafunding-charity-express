@@ -82,7 +82,7 @@ export const crateCharity = async (
     } = req.body
 
     const userDecodedToken: any = await decodedToken(req, res)
-
+    
     const dataCharity: ICharity = {
       slug: slugify(title),
       author: userDecodedToken.id,
@@ -106,3 +106,12 @@ export const crateCharity = async (
     return errorHandler(error, res)
   }
 }
+
+// desc create charity
+// @route POST /api/v1/charity/
+// @access Private
+export const updateCharity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {}
