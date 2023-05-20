@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt, { JwtPayload, VerifyOptions } from 'jsonwebtoken'
-import { JWT_SECRET } from '../../../utils'
-import User from '../../user/model'
+import { JWT_SECRET } from '../utils'
+import User from '../module/user/model'
 
 interface CustomRequest extends Request {
   user?: JwtPayload
