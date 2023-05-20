@@ -1,9 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
 import Charity from '../model'
-import { ICharity } from '../model/charityInterface'
+import { ICharity, RequestWithUserRole } from '../model/charityInterface'
 import { errorHandler } from '../../../utils/helpers/errorHandler'
 import { slugify } from '../../../utils/helpers/slug'
-import { decodedToken } from '../../../utils/helpers/decodedToken'
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity
@@ -65,7 +64,7 @@ export const getCharityById = async (
 // @route POST /api/v1/charity/
 // @access Private
 export const crateCharity = async (
-  req: Request,
+  req: RequestWithUserRole,
   res: Response,
   next: NextFunction
 ) => {
@@ -81,11 +80,12 @@ export const crateCharity = async (
       post_date = null,
     } = req.body
 
-    const userDecodedToken: any = await decodedToken(req, res)
-    
+    const { userId } = req.body.user
+    // const userId = userLogged?.id
+
     const dataCharity: ICharity = {
       slug: slugify(title),
-      author: userDecodedToken.id,
+      author: userId,
       title,
       description,
       donation_target,

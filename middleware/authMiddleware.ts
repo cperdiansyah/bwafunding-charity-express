@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import jwt, { JwtPayload, VerifyOptions } from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import { JWT_SECRET } from '../utils'
 import User from '../module/user/model'
-import { decodedToken } from '../utils/helpers/decodedToken'
 
 interface CustomRequest extends Request {
   user?: JwtPayload
@@ -46,9 +45,8 @@ export const adminAccess = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userDecodedToken: any = await decodedToken(req, res)
-  console.log(userDecodedToken)
-  if (userDecodedToken.role === 'admin' || userDecodedToken.is_verified) {
+  const userLogged = req.body.user
+  if (userLogged && (userLogged.role === 'admin' || userLogged.is_verified)) {
     next()
   } else {
     return res.status(403).json({

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { Request } from 'express'
 
 export interface ICharity {
   title: string
@@ -17,4 +18,8 @@ export interface ICharity {
 export interface ICharityMedia {
   content: string
   content_type: 'image' | 'video'
+}
+
+export interface RequestWithUserRole extends Request {
+  user?: Record<string, any>
 }
