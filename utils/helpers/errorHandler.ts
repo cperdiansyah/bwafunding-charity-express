@@ -1,9 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 
-export const errorHandler = (
-  err: any,
-  res: Response,
-) => {
+export const errorHandler = (err: any, res: Response) => {
   if (err.code === 500) {
     // Handle server error (500)
     return res.status(500).json({
@@ -20,13 +17,19 @@ export const errorHandler = (
         message: 'Not found',
       },
     })
-  } else {
+  } else if (res.statusCode === 400) {
     // Handle other errors (400)
-    console.error(err)
     return res.status(400).json({
       error: {
         code: 400,
         message: 'Bad request',
+      },
+    })
+  } else {
+   return res.status(400).json({
+      error: {
+        code: 400,
+        massage: err,
       },
     })
   }

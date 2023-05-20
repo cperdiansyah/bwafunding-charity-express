@@ -11,6 +11,7 @@ import {
   JWT_COOKIE_EXPIRES_IN_MS,
 } from '../../../utils'
 import { isEmail } from '../../../utils/helpers'
+import { errorHandler } from '../../../utils/helpers/errorHandler'
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body
@@ -134,11 +135,13 @@ export const register = async (req: Request, res: Response) => {
     })
   } catch (err) {
     // console.log(err)
-    return res.status(400).json({
-      error: {
-        code: 400,
-        massage: err,
-      },
-    })
+    return errorHandler(err, res)
+    
+  //   return res.status(400).json({
+  //     error: {
+  //       code: 400,
+  //       massage: err,
+  //     },
+  //   })
   }
 }

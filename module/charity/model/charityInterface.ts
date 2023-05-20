@@ -11,7 +11,7 @@ export interface ICharity {
   end_date: Date | null
   post_date: Date | null
   author: mongoose.Schema.Types.ObjectId | null
-  media?: ICharityMedia[]
+  media?: ICharityMedia[] | null
 }
 
 export interface ICharityMedia {
