@@ -10,19 +10,13 @@ import {
   REFRESH_TOKEN_SECRET,
   JWT_COOKIE_EXPIRES_IN_MS,
 } from '../../../utils'
-import { isEmail } from '../../../utils/helpers'
 import { errorHandler } from '../../../utils/helpers/errorHandler'
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body
-  let user
-  if (isEmail(email)) {
-    // Check user login with email
-    user = await User.findOne({ email })
-  } else {
-    // Check user login with password
-    user = await User.findOne({ username: email })
-  }
+  let user = await User.findOne({
+    $or: [{ email }, { username: email }],
+  })
 
   if (!user) {
     return res.status(404).json({
@@ -93,7 +87,7 @@ export const register = async (req: Request, res: Response) => {
     if (user) {
       return res.status(400).json({
         code: 400,
-        massage: 'User already exists',
+        massage: 'User with username or username already exists',
       })
     }
     const hashPassword = await hashSync(password, genSaltSync(10))
@@ -134,14 +128,6 @@ export const register = async (req: Request, res: Response) => {
       accessToken,
     })
   } catch (err) {
-    // console.log(err)
     return errorHandler(err, res)
-    
-  //   return res.status(400).json({
-  //     error: {
-  //       code: 400,
-  //       massage: err,
-  //     },
-  //   })
   }
 }

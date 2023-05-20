@@ -26,10 +26,10 @@ export const errorHandler = (err: any, res: Response) => {
       },
     })
   } else {
-   return res.status(400).json({
+    return res.status(400).json({
       error: {
         code: 400,
-        massage: err,
+        error: err,
       },
     })
   }
