@@ -70,14 +70,16 @@ export const crateCharity = async (
   next: NextFunction
 ) => {
   try {
-    const { title, description, donation_target, start_date, end_date } =
-      req.body
-
-    /* 
-     status,
-     is_draft,
-     post_date,
-    */
+    let {
+      title,
+      description,
+      donation_target,
+      start_date,
+      end_date,
+      status = 'inactive',
+      is_draft = true,
+      post_date = null,
+    } = req.body
 
     const userDecodedToken: any = await decodedToken(req, res)
 
@@ -89,12 +91,10 @@ export const crateCharity = async (
       donation_target,
       start_date,
       end_date,
-      is_draft: false,
-      status: 'active',
-      post_date: null,
+      is_draft,
+      status,
+      post_date,
     }
-
-    
 
     const newCharity = await Charity.create(dataCharity)
 
