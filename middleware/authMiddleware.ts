@@ -21,20 +21,21 @@ export const protect = async (
       token = req.headers.authorization.split(' ')[1]
 
       const decoded = jwt.verify(token, JWT_SECRET)
-      console.log(decoded)
       // req.body.user = await User.findById(decoded.id).select('-password')
       next()
     } catch (error) {
-      console.log(error)
-      res.status(401)
-      throw new Error('Not authorized, token failed')
+      return res.status(401).json({
+        code: 401,
+        error: 'unauthorized, token failed',
+      })
     }
   } else {
-    res.status(401).json({ error: 'No token provided' })
-    return
+    return res.status(401).json({ code: 401, error: 'No token included' })
   }
   if (!token) {
-    res.status(401)
-    throw new Error('You are not authenticated')
+    return res.status(401).json({
+      code: 401,
+      error: 'You are not authenticated',
+    })
   }
 }

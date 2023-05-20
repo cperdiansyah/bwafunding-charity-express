@@ -1,5 +1,6 @@
 import express from 'express'
 import { crateCharity, getAllCharity, getCharityById } from '../controller'
+import { protect } from '../../../middleware/authMiddleware'
 
 const router = express.Router()
 
@@ -8,7 +9,7 @@ router.get('/', getAllCharity)
 router.get('/:id', getCharityById)
 
 // Post Router
-router.post('/', crateCharity)
+router.route('/').post(protect, crateCharity)
 
 
 export default router

@@ -3,6 +3,7 @@ import Charity from '../model'
 import { ICharity } from '../model/charityInterface'
 import { errorHandler } from '../../../utils/helpers/errorHandler'
 import { slugify } from '../../../utils/helpers/slug'
+import { decodedToken } from '../../../utils/helpers/decodedToken'
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity
@@ -69,20 +70,37 @@ export const crateCharity = async (
   next: NextFunction
 ) => {
   try {
-    const {
+    const { title, description, donation_target, start_date, end_date } =
+      req.body
+
+    /* 
+     status,
+     is_draft,
+     post_date,
+    */
+
+    const userDecodedToken: any = await decodedToken(req, res)
+
+    const dataCharity: ICharity = {
+      slug: slugify(title),
+      author: userDecodedToken.id,
       title,
       description,
       donation_target,
       start_date,
       end_date,
-      author,
-    } = req.body
-    // const authorId = req?.user?.id
+      is_draft: false,
+      status: 'active',
+      post_date: null,
+    }
+
+    
+
+    const newCharity = await Charity.create(dataCharity)
 
     return res.status(200).json({
       status: 'success',
-      content: slugify(title),
-      // author : authorId
+      content: newCharity,
     })
   } catch (error) {
     return errorHandler(error, res)
