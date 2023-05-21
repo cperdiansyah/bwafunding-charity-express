@@ -10,6 +10,7 @@ dotenv.config()
 /* Routes */
 import seederRoutes from './module/seeder/routes'
 import authRoutes from './module/auth/routes'
+import charityRoutes from './module/charity/routes'
 
 const app: Express = express()
 dbConnect()
@@ -28,6 +29,10 @@ app.get('/', (req: Request, res: Response) => {
 
 // Auth routes
 app.use('/api/v1/auth', authRoutes)
+
+/* Charity router */
+app.use('/api/v1/charity', charityRoutes)
+
 
 // Seeder route
 if (NODE_ENV?.trim() === 'development') {

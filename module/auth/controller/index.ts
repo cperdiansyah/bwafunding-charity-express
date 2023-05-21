@@ -10,10 +10,14 @@ import {
   REFRESH_TOKEN_SECRET,
   JWT_COOKIE_EXPIRES_IN_MS,
 } from '../../../utils'
+import { errorHandler } from '../../../utils/helpers/errorHandler'
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body
-  const user = await User.findOne({ email })
+  let user = await User.findOne({
+    $or: [{ email }, { username: email }],
+  })
+
   if (!user) {
     return res.status(404).json({
       error: {
@@ -37,6 +41,7 @@ export const login = async (req: Request, res: Response) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    is_verified: user.is_verified,
   }
 
   const accessToken = jwt.sign(userData, JWT_SECRET, {
@@ -56,6 +61,8 @@ export const login = async (req: Request, res: Response) => {
     })
     .json({
       name: user.name,
+      email: user.email,
+      role: user.role,
       accessToken,
     })
 }
@@ -81,7 +88,7 @@ export const register = async (req: Request, res: Response) => {
     if (user) {
       return res.status(400).json({
         code: 400,
-        massage: 'User already exists',
+        massage: 'User with username or username already exists',
       })
     }
     const hashPassword = await hashSync(password, genSaltSync(10))
@@ -96,7 +103,7 @@ export const register = async (req: Request, res: Response) => {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
-      isAdmin: false,
+      is_verified: newUser.is_verified,
     }
 
     const accessToken = jwt.sign(userData, JWT_SECRET, {
@@ -117,15 +124,11 @@ export const register = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
       accessToken,
     })
   } catch (err) {
-    // console.log(err)
-    return res.status(400).json({
-      error: {
-        code: 400,
-        massage: err,
-      },
-    })
+    return errorHandler(err, res)
   }
 }
