@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
 import Charity from '../model'
-import { ICharity, RequestWithUserRole } from '../model/charityInterface'
+import {
+  IAcceptCharityData,
+  ICharity,
+  RequestWithUserRole,
+} from '../model/charityInterface'
 import { errorHandler } from '../../../utils/helpers/errorHandler'
 import { slugify } from '../../../utils/helpers/slug'
 
@@ -80,8 +84,7 @@ export const crateCharity = async (
       post_date = null,
     } = req.body
 
-    const { userId } = req.body.user
-    // const userId = userLogged?.id
+    const { id: userId } = req.body.user
 
     const dataCharity: ICharity = {
       slug: slugify(title),
@@ -107,11 +110,150 @@ export const crateCharity = async (
   }
 }
 
-// desc create charity
-// @route POST /api/v1/charity/
+// desc update charity
+// @route patch /api/v1/charity/:id
 // @access Private
 export const updateCharity = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {}
+) => {
+  try {
+    const { id } = req.params // ID of the charity to update
+    const {
+      title,
+      description,
+      donation_target,
+      start_date,
+      end_date,
+      is_draft,
+    } = req.body // Updated data
+
+    const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
+
+    // Find the charity by ID and check if the author matches the user ID
+    const existingCharity = await Charity.findById(id)
+    if (!existingCharity) {
+      return res
+        .status(404)
+        .json({ error: { code: 404, message: 'Charity not found' } })
+    }
+
+    // Check if the user making the request is the author of the charity
+    if (existingCharity?.author?.toString() !== userId) {
+      return res.status(403).json({
+        error: {
+          code: 403,
+          message: 'You are not authorized to update this charity',
+        },
+      })
+    }
+
+    const dataCharity: ICharity = {
+      slug: slugify(title),
+      author: userId,
+      title,
+      description,
+      donation_target,
+      start_date,
+      end_date,
+      is_draft,
+      post_date: existingCharity.post_date,
+      status: existingCharity.status,
+    }
+
+    const updatedCharity = await Charity.updateOne(
+      { _id: id },
+      { $set: dataCharity }
+    )
+    if (updatedCharity.modifiedCount === 0) {
+      return res.status(200).json({ message: 'No changes made to the charity' })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Charity updated successfully',
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
+// desc update charity
+// @route patch /api/v1/charity/:id/status
+// @access Private
+export const acceptCharity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params // ID of the charity to update
+    const { status } = req.body // Updated data
+
+    // Find the charity by ID and check if the author matches the user ID
+    const existingCharity = await Charity.findById(id)
+    if (!existingCharity) {
+      return res
+        .status(404)
+        .json({ error: { code: 404, message: 'Charity not found' } })
+    }
+
+    let dataCharity: IAcceptCharityData = {
+      status: status,
+    }
+
+    if (status === 'accept') {
+      dataCharity = {
+        ...dataCharity,
+        post_date: Date.now(),
+      }
+    }
+
+    await Charity.updateOne({ _id: id }, { $set: dataCharity })
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Charity updated successfully',
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
+// desc delete charity
+// @route delete /api/v1/charity/:id
+// @access Private
+export const deleteCharity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params
+
+    const charity = await Charity.findById(id)
+
+    const { role } = req.body.user
+
+    if (!charity) {
+      return res.status(404).json({ error: 'Charity not found' })
+    }
+
+    // Check if the user making the request is the author of the charity
+    if (role !== 'admin') {
+      return res
+        .status(403)
+        .json({ error: 'You are not authorized to delete this charity' })
+    }
+
+    await Charity.deleteOne({ _id: id })
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Charity deleted successfully',
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
