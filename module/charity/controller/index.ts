@@ -17,7 +17,15 @@ export const getAllCharity = async (
   next: NextFunction
 ) => {
   try {
+    const page = parseInt(req.query.page as string) || 1
+    const rows = parseInt(req.query.rows as string) || 10
+
+    const totalCount = await Charity.countDocuments({})
+    const totalPages = Math.ceil(totalCount / rows)
+
     const charities: ICharity[] = await Charity.find({})
+      .skip((page - 1) * rows)
+      .limit(rows)
       .populate({
         path: 'author',
         select: 'name',
@@ -26,7 +34,12 @@ export const getAllCharity = async (
       .exec()
     return res.status(200).json({
       charity: charities,
-      stats: charities.length,
+      stats: {
+        page,
+        rows,
+        totalPages,
+        totalCount,
+      },
     })
   } catch (error) {
     return errorHandler(error, res)
