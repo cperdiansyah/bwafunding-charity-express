@@ -11,4 +11,6 @@ export const {
   JWT_EXPIRES_IN,
   JWT_COOKIE_EXPIRES_IN,
   JWT_COOKIE_EXPIRES_IN_MS,
+  CORS_OPEN = '',
+  CORS_LOCAL = '',
 } = process.env
