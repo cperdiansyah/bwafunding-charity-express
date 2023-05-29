@@ -40,7 +40,12 @@ app.use(
 
 app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
   if (err.message === 'Not allowed by CORS') {
-    res.status(403).json({ error: 'Not allowed by CORS' })
+    res.status(403).json({
+      error: {
+        code: 403,
+        message: 'Not allowed by CORS',
+      },
+    })
   } else {
     next(err)
   }
