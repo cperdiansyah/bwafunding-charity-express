@@ -30,7 +30,6 @@
     "sequelize": "^6.31.1"
   },
   "devDependencies": {
-    "@faker-js/faker": "^8.0.2",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
