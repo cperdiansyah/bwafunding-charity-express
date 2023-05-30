@@ -1,6 +1,6 @@
 // const mongoose = require('mongoose')
 import mongoose, { ConnectOptions } from 'mongoose'
-import asyncHandler from 'express-async-handler'
+// import asyncHandler from 'express-async-handler'
 
 import { MONGODB_URI } from '../utils'
 

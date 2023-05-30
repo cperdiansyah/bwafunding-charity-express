@@ -74,7 +74,11 @@ if (NODE_ENV?.trim() === 'development') {
 }
 
 app.listen(PORT, () => {
-  console.log(
-    `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${PORT}`
-  )
+  let log
+  if (NODE_ENV?.trim() === 'development') {
+    log  = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${PORT}`
+  } else {
+    log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on ${PORT}`
+  }
+  console.log(log)
 })

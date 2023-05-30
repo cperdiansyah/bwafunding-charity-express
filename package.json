@@ -2,15 +2,16 @@
   "name": "bwafunding-charity-express",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
-  "type": "module",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc",
-    "start": "node dist/index.js",
-    "dev": "set NODE_ENV=development && nodemon index.ts",
-    "data:import": "node utils/seeder",
-    "data:destroy": "node utils/seeder -d"
+    "start": "npx tsc -w",
+    "dev": "npx nodemon",
+    "build": "tsc",
+    "format": "prettier --write .",
+    "check-types": "tsc --pretty --noEmit",
+    "check-format": "prettier --check .",
+    "check-lint": "eslint . --ext ts --ext tsx --ext js"
   },
   "author": "cperdiansyah",
   "license": "ISC",
