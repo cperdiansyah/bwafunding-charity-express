@@ -1,29 +1,32 @@
 {
-    "env": {
-        "commonjs": true,
-        "browser": true,
-        "es2021": true
-    },
-    "extends": [
-        "standard-with-typescript",
-        "prettier"
+  "env": {
+    "commonjs": true,
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "standard-with-typescript",
+    "prettier"
+  ],
+  "plugins": [
+    "import"
+  ],
+  "overrides": [],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-console": "off",
+    "linebreak-style": "off",
+    "no-underscore-dangle": "off",
+    "consistent-return": "off",
+    "no-trailing-spaces": [
+      2,
+      {
+        "skipBlankLines": true
+      }
     ],
-    "overrides": [],
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
-    "rules": {
-        "no-console": "off",
-        "linebreak-style": "off",
-        "no-underscore-dangle": "off",
-        "consistent-return": "off",
-        "no-trailing-spaces": [
-            2,
-            {
-                "skipBlankLines": true
-            }
-        ],
-        "import/extensions": false
-    }
+    "import/extensions": 0
+  }
 }
