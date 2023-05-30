@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
-import Charity from '../model'
+import Charity from '../model/index.js'
 import {
   IAcceptCharityData,
   ICharity,
   RequestWithUserRole,
-} from '../model/charityInterface'
-import { errorHandler } from '../../../utils/helpers/errorHandler'
-import { slugify } from '../../../utils/helpers/slug'
+} from '../model/charityInterface.js'
+import { errorHandler } from '../../../utils/helpers/errorHandler.js'
+import { slugify } from '../../../utils/helpers/slug.js'
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity

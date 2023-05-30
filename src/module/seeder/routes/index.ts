@@ -1,5 +1,5 @@
 import express from 'express'
-import { destroyData, importData } from '../controller'
+import { destroyData, importData } from '../controller/index.js'
 
 const router = express.Router()
 

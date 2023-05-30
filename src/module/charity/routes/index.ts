@@ -6,12 +6,12 @@ import {
   getAllCharity,
   getCharityById,
   updateCharity,
-} from '../controller'
+} from '../controller/index.js'
 import {
   adminAndUserVerifiedAccess,
   admindAccess,
   protect,
-} from '../../../middleware/authMiddleware'
+} from '../../../middleware/authMiddleware.js'
 
 const router = express.Router()
 

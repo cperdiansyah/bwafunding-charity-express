@@ -1,6 +1,6 @@
 // import bcrypt from 'bcryptjs'
 import { genSaltSync, hashSync } from 'bcrypt-ts'
-import { IUser } from '../module/user/model/userInterface'
+import { IUser } from '../module/user/model/userInterface.js'
 
 const users: IUser[] = [
   {

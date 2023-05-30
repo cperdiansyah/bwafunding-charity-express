@@ -1,4 +1,4 @@
-import { ICharity } from '../module/charity/model/charityInterface'
+import { ICharity } from '../module/charity/model/charityInterface.js'
 const charities: ICharity[] = [
   {
     title: 'Charity 1',

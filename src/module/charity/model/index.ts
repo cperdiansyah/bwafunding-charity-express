@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose'
-import { ICharity, ICharityMedia } from './charityInterface'
+import { ICharity, ICharityMedia } from './charityInterface.js'
 
 const media: Schema<ICharityMedia> = new mongoose.Schema({
   content: {
@@ -38,7 +38,7 @@ const charitySchema: Schema<ICharity> = new mongoose.Schema(
     status: {
       type: String,
       required: [true, 'status is required'],
-      default: 'inactive'
+      default: 'inactive',
     },
     is_draft: {
       type: Boolean,

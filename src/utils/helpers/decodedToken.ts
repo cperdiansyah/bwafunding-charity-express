@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 import { Request, Response } from 'express'
-import { JWT_SECRET } from '../index'
+import { JWT_SECRET } from '../index.js'
 
 export const decodedToken = async (req: Request, res: Response) => {
   if (

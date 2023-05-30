@@ -2,15 +2,15 @@ import { Request, Response } from 'express'
 import { compare, genSaltSync, hashSync } from 'bcrypt-ts'
 import jwt from 'jsonwebtoken'
 // import asyncHandler from 'express-async-handler'
-import User from '../../user/model'
+import User from '../../user/model/index.js'
 import {
   JWT_COOKIE_EXPIRES_IN,
   JWT_EXPIRES_IN,
   JWT_SECRET,
   REFRESH_TOKEN_SECRET,
   JWT_COOKIE_EXPIRES_IN_MS,
-} from '../../../utils'
-import { errorHandler } from '../../../utils/helpers/errorHandler'
+} from '../../../utils/index.js'
+import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body

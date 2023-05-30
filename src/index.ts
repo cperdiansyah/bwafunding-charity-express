@@ -4,14 +4,14 @@ import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import cors from 'cors'
 
-import { CORS_LOCAL, CORS_OPEN, NODE_ENV, PORT } from './utils'
-import dbConnect from './config/database'
+import { CORS_LOCAL, CORS_OPEN, NODE_ENV, PORT } from './utils/index.js'
+import dbConnect from './config/database.js'
 dotenv.config()
 
 /* Routes */
-import seederRoutes from './module/seeder/routes'
-import authRoutes from './module/auth/routes'
-import charityRoutes from './module/charity/routes'
+import seederRoutes from './module/seeder/routes/index.js'
+import authRoutes from './module/auth/routes/index.js'
+import charityRoutes from './module/charity/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -76,7 +76,7 @@ if (NODE_ENV?.trim() === 'development') {
 app.listen(PORT, () => {
   let log
   if (NODE_ENV?.trim() === 'development') {
-    log  = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${PORT}`
+    log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${PORT}`
   } else {
     log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on ${PORT}`
   }

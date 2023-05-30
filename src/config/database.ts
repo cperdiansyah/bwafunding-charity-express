@@ -2,7 +2,7 @@
 import mongoose, { ConnectOptions } from 'mongoose'
 // import asyncHandler from 'express-async-handler'
 
-import { MONGODB_URI } from '../utils'
+import { MONGODB_URI } from '../utils/index.js'
 
 // const dbConnect = asyncHandler(async (req, res, next) => {
 //   try {

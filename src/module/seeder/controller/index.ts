@@ -1,14 +1,14 @@
 import { Types } from 'mongoose'
 import { Request, Response } from 'express'
-import { ICharity } from '../../charity/model/charityInterface'
+import { ICharity } from '../../charity/model/charityInterface.js'
 
 // Data
-import users from '../../../data/users'
-import charities from '../../../data/charity'
+import users from '../../../data/users.js'
+import charities from '../../../data/charity.js'
 
 // Model
-import User from '../../user/model'
-import Charity from '../../charity/model'
+import User from '../../user/model/index.js'
+import Charity from '../../charity/model/index.js'
 
 export const importData = async (req: Request, res: Response) => {
   try {
@@ -18,12 +18,10 @@ export const importData = async (req: Request, res: Response) => {
     const createdUsers = await User.insertMany(users)
     const adminUser = createdUsers[0]._id
 
-    const mappedCharity = charities.map((charity:ICharity) => (
-      {
-        ...charity,
-        author : new Types.ObjectId(adminUser)
-      }
-    ))
+    const mappedCharity = charities.map((charity: ICharity) => ({
+      ...charity,
+      author: new Types.ObjectId(adminUser),
+    }))
 
     await Charity.insertMany(mappedCharity)
 
