@@ -4,7 +4,13 @@
     "browser": true,
     "es2021": true
   },
-  "extends": ["standard-with-typescript", "prettier"],
+  "extends": [
+    "standard-with-typescript",
+    "prettier"
+  ],
+  "plugins": [
+    "import"
+  ],
   "overrides": [],
   "parserOptions": {
     "ecmaVersion": "latest",
@@ -21,6 +27,6 @@
         "skipBlankLines": true
       }
     ],
-    "import/extensions": false
+    "import/extensions": 0
   }
 }
