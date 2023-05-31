@@ -22,12 +22,19 @@ if (process.env.NODE_ENV?.trim() === 'development') {
 
 const whitelist: string[] = [CORS_LOCAL, ...CORS_OPEN?.split(', ')]
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  )
+  next()
+})
+
 app.use(
   cors({
-    // origin: CORS_OPEN || CORS_LOCAL,
-    // origin: whitelist,
     origin: function (origin: any, callback: CallableFunction) {
-      console.log(origin)
+      // console.log(origin)
       if (whitelist.indexOf(origin) !== -1 || !origin) {
         callback(null, true)
       } else {
