@@ -9,25 +9,30 @@ import {
 } from '../controller/index.js'
 import {
   adminAndUserVerifiedAccess,
-  admindAccess,
-  protect,
+  adminAccess,
 } from '../../../middleware/authMiddleware.js'
+import {
+  verifyAnonymousToken,
+  verifyToken,
+} from '../../../middleware/verifyToken.js'
 
 const router = express.Router()
 
 // Get Router
-router.get('/', getAllCharity)
-router.get('/:id', getCharityById)
+router.route('/').get([verifyAnonymousToken], getAllCharity)
+router.route('/:id').get([verifyAnonymousToken], getCharityById)
 
 // Post Router
-router.route('/').post([protect, adminAndUserVerifiedAccess], crateCharity)
+router.route('/').post([verifyToken, adminAndUserVerifiedAccess], crateCharity)
 
 // Patch Router
 // update charity
-router.route('/:id').patch([protect, adminAndUserVerifiedAccess], updateCharity)
+router
+  .route('/:id')
+  .patch([verifyToken, adminAndUserVerifiedAccess], updateCharity)
 // accept charity
-router.route('/:id/status').patch([protect, admindAccess], acceptCharity)
+router.route('/:id/status').patch([verifyToken, adminAccess], acceptCharity)
 
 // Delete Router
-router.route('/:id').delete([protect, admindAccess], deleteCharity)
+router.route('/:id').delete([verifyToken, adminAccess], deleteCharity)
 export default router

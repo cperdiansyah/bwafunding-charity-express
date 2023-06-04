@@ -46,6 +46,11 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       required: [true, 'Password is required'],
       default: false,
     },
+    refresh_token: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   { timestamps: true }
 )
