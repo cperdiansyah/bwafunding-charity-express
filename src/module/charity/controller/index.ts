@@ -34,11 +34,11 @@ export const getAllCharity = async (
       .exec()
     return res.status(200).json({
       charity: charities,
-      stats: {
+      meta: {
         page,
         rows,
         totalPages,
-        totalCount,
+        total: totalCount,
       },
     })
   } catch (error) {
