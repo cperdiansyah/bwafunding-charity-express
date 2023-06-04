@@ -56,7 +56,7 @@ export const adminAndUserVerifiedAccess = async (
   }
 }
 
-export const admindAccess = async (
+export const adminAccess = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction

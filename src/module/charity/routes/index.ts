@@ -9,7 +9,7 @@ import {
 } from '../controller/index.js'
 import {
   adminAndUserVerifiedAccess,
-  admindAccess,
+  adminAccess,
   protect,
 } from '../../../middleware/authMiddleware.js'
 
@@ -26,8 +26,8 @@ router.route('/').post([protect, adminAndUserVerifiedAccess], crateCharity)
 // update charity
 router.route('/:id').patch([protect, adminAndUserVerifiedAccess], updateCharity)
 // accept charity
-router.route('/:id/status').patch([protect, admindAccess], acceptCharity)
+router.route('/:id/status').patch([protect, adminAccess], acceptCharity)
 
 // Delete Router
-router.route('/:id').delete([protect, admindAccess], deleteCharity)
+router.route('/:id').delete([protect, adminAccess], deleteCharity)
 export default router

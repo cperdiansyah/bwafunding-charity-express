@@ -41,6 +41,7 @@ export const login = async (req: Request, res: Response) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    isAuthenticated: true,
     is_verified: user.is_verified,
   }
 
@@ -48,23 +49,25 @@ export const login = async (req: Request, res: Response) => {
     expiresIn: JWT_EXPIRES_IN || '20s',
   })
   const refreshToken = jwt.sign(userData, REFRESH_TOKEN_SECRET, {
-    expiresIn: JWT_COOKIE_EXPIRES_IN || '7d',
+    expiresIn: JWT_COOKIE_EXPIRES_IN || '1d',
   })
 
-  return res
-    .cookie('refreshToken', refreshToken, {
-      expires: new Date(
-        Date.now() +
-          eval(JWT_COOKIE_EXPIRES_IN_MS || `${7 * 24 * 60 * 60}`) * 1000
-      ),
-      httpOnly: true,
-    })
-    .json({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      accessToken,
-    })
+  await User.findOneAndUpdate(
+    { _id: userData.id },
+    {
+      refresh_token: refreshToken,
+    }
+  )
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    maxAge: eval(JWT_COOKIE_EXPIRES_IN_MS || `${24 * 60 * 60}`) * 1000,
+  })
+  return res.json({
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    accessToken,
+  })
 }
 
 export const logout = async (req: Request, res: Response) => {
