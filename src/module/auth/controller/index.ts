@@ -11,6 +11,7 @@ import {
   JWT_COOKIE_EXPIRES_IN_MS,
 } from '../../../utils/index.js'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
+import { IAnonymousToken, ITokenPayload } from '../../../types/index.js'
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body
@@ -36,7 +37,7 @@ export const login = async (req: Request, res: Response) => {
     })
   }
 
-  const userData = {
+  const userData: ITokenPayload = {
     id: user._id,
     name: user.name,
     email: user.email,
@@ -58,6 +59,7 @@ export const login = async (req: Request, res: Response) => {
       refresh_token: refreshToken,
     }
   )
+  res.clearCookie('refreshAnonToken')
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     maxAge: eval(JWT_COOKIE_EXPIRES_IN_MS || `${24 * 60 * 60}`) * 1000,
@@ -73,9 +75,21 @@ export const login = async (req: Request, res: Response) => {
 export const logout = async (req: Request, res: Response) => {
   const { refreshToken } = req.cookies
   if (!refreshToken) return res.sendStatus(204)
+
+  const user = await User.findOne({
+    refresh_token: refreshToken,
+  })
+  if (!user) return res.sendStatus(204)
+
+  await User.findOneAndUpdate(
+    { _id: user.id },
+    {
+      refresh_token: null,
+    }
+  )
   res.clearCookie('refreshToken')
-  // return res.json(req.cookies)
-  // return res.sendStatus(200).redirect('/')
+  res.clearCookie('refreshAnonToken')
+
   return res.status(200).json({
     status: 'success',
     message: 'user logged out',
@@ -116,7 +130,7 @@ export const register = async (req: Request, res: Response) => {
     const refreshToken = jwt.sign(userData, REFRESH_TOKEN_SECRET, {
       expiresIn: JWT_COOKIE_EXPIRES_IN || '7d',
     })
-
+    res.clearCookie('refreshAnonToken')
     res.cookie('refreshToken', refreshToken, {
       expires: new Date(
         Date.now() +
@@ -134,4 +148,30 @@ export const register = async (req: Request, res: Response) => {
   } catch (err) {
     return errorHandler(err, res)
   }
+}
+
+export const anonymousToken = async (req: Request, res: Response) => {
+  const tokenData: IAnonymousToken = {
+    role: 'user',
+    isAuthenticated: false,
+    is_verified: false,
+  }
+
+  const accessToken = jwt.sign(tokenData, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN || '20s',
+  })
+  const refreshToken = jwt.sign(tokenData, REFRESH_TOKEN_SECRET, {
+    expiresIn: JWT_COOKIE_EXPIRES_IN || '1d',
+  })
+
+  res.clearCookie('refreshToken')
+  res.cookie('refreshAnonToken', refreshToken, {
+    httpOnly: true,
+    maxAge: eval(JWT_COOKIE_EXPIRES_IN_MS || `${24 * 60 * 60}`) * 1000,
+  })
+
+  return res.json({
+    role: tokenData.role,
+    accessToken,
+  })
 }
