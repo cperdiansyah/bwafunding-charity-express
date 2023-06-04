@@ -1,5 +1,8 @@
+import { Types } from "mongoose"
+
 // Define interface for User document
 export interface IUser {
+  _id?: Types.ObjectId
   name: string
   username: string
   email: string
@@ -8,4 +11,5 @@ export interface IUser {
   is_verified?: boolean
   createdAt?: Date
   updatedAt?: Date
+  refresh_token?: string
 }
