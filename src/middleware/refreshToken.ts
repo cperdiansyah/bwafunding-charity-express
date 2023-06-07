@@ -78,8 +78,10 @@ export const refreshToken = async (req: Request, res: Response) => {
         expiresIn: JWT_EXPIRES_IN || '20s',
       })
       return res.json({ accessToken })
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      if (error.name === 'TokenExpiredError') {
+        res.clearCookie('refreshToken')
+      }
       return errorHandler(error, res)
     }
   }
