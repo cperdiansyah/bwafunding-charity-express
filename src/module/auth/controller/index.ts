@@ -14,7 +14,7 @@ import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { IAnonymousToken, ITokenPayload } from '../../../types/index.js'
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body
+  const { email, password, remember } = req.body
   let user = await User.findOne({
     $or: [{ email }, { username: email }],
   })
@@ -49,9 +49,18 @@ export const login = async (req: Request, res: Response) => {
   const accessToken = jwt.sign(userData, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN || '20s',
   })
-  const refreshToken = jwt.sign(userData, REFRESH_TOKEN_SECRET, {
-    expiresIn: JWT_COOKIE_EXPIRES_IN || '1d',
-  })
+
+  let refreshToken
+
+  if (!remember) {
+    refreshToken = jwt.sign(userData, REFRESH_TOKEN_SECRET, {
+      expiresIn: JWT_COOKIE_EXPIRES_IN || '1d',
+    })
+  } else {
+    refreshToken = jwt.sign(userData, REFRESH_TOKEN_SECRET, {
+      expiresIn: '7d',
+    })
+  }
 
   await User.findOneAndUpdate(
     { _id: userData.id },
@@ -63,6 +72,8 @@ export const login = async (req: Request, res: Response) => {
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     maxAge: eval(JWT_COOKIE_EXPIRES_IN_MS || `${24 * 60 * 60}`) * 1000,
+    // sameSite: 'none',
+    // secure: true,
   })
   return res.json({
     name: user.name,
@@ -137,6 +148,8 @@ export const register = async (req: Request, res: Response) => {
           eval(JWT_COOKIE_EXPIRES_IN_MS || `${7 * 24 * 60 * 60}`) * 1000
       ),
       httpOnly: true,
+      // sameSite: 'none',
+      // secure: true,
     })
 
     return res.status(201).json({
@@ -168,6 +181,8 @@ export const anonymousToken = async (req: Request, res: Response) => {
   res.cookie('refreshAnonToken', refreshToken, {
     httpOnly: true,
     maxAge: eval(JWT_COOKIE_EXPIRES_IN_MS || `${24 * 60 * 60}`) * 1000,
+    // sameSite: 'none',
+    // secure: true,
   })
 
   return res.json({
