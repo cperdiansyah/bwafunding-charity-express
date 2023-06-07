@@ -23,6 +23,7 @@ if (process.env.NODE_ENV?.trim() === 'development') {
 const whitelist: string[] = [CORS_LOCAL, ...CORS_OPEN?.split(', ')]
 
 app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true')
   res.header('Access-Control-Allow-Origin', '*')
   res.header(
     'Access-Control-Allow-Headers',
@@ -34,7 +35,6 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: function (origin: any, callback: CallableFunction) {
-      // console.log(origin)
       if (whitelist.indexOf(origin) !== -1 || !origin) {
         callback(null, true)
       } else {
