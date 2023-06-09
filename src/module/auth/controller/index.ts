@@ -23,7 +23,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(404).json({
       error: {
         code: 404,
-        massage: 'User not found',
+        message: 'User not found',
       },
     })
   }
@@ -32,7 +32,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({
       error: {
         code: 404,
-        massage: 'invalid credentials',
+        message: 'invalid credentials',
       },
     })
   }
@@ -116,7 +116,7 @@ export const register = async (req: Request, res: Response) => {
     if (user) {
       return res.status(400).json({
         code: 400,
-        massage: 'User with username or username already exists',
+        message: 'User with username or username already exists',
       })
     }
     const hashPassword = await hashSync(password, genSaltSync(10))
