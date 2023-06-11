@@ -19,7 +19,6 @@ dbConnect()
 if (process.env.NODE_ENV?.trim() === 'development') {
   app.use(morgan('dev'))
 }
-const port: number = PORT ? Number(PORT) : 3000
 
 const whitelist: string[] = [CORS_LOCAL, ...CORS_OPEN?.split(', ')]
 
@@ -81,7 +80,10 @@ if (NODE_ENV?.trim() === 'development') {
   app.use('/api/v1/seeder', seederRoutes)
 }
 
-app.listen(port, `${process.env.HOST}`, () => {
+const port: number = PORT ? Number(process.env.PORT) : 3000
+const host = process.env.HOST || '0.0.0.0'
+
+app.listen(port, `${host}`, () => {
   let log
   if (NODE_ENV?.trim() === 'development') {
     log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${port}`
