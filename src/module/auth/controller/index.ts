@@ -181,6 +181,8 @@ export const register = async (req: Request, res: Response) => {
     res.clearCookie('refreshAnonToken')
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
+      // sameSite: 'none',
+      // secure: true,
     })
     await session.commitTransaction()
     session.endSession()
