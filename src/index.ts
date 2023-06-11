@@ -81,8 +81,9 @@ if (NODE_ENV?.trim() === 'development') {
 }
 
 const port: number = PORT ? Number(process.env.PORT) : 3000
+const host = process.env.HOST || '0.0.0.0'
 
-app.listen(port, `${process.env.HOST}`, () => {
+app.listen(port, `${host}`, () => {
   let log
   if (NODE_ENV?.trim() === 'development') {
     log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${port}`
