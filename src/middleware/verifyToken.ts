@@ -59,7 +59,7 @@ export const verifyAnonymousToken = (
     try {
       jwt.verify(token, JWT_SECRET) as ITokenPayload
       next()
-    } catch (error) {
+    } catch (error: any) {
       return res.status(401).json({
         error: {
           code: 401,
