@@ -12,6 +12,7 @@ import {
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { IAnonymousToken, ITokenPayload } from '../../../types/index.js'
 import mongoose from 'mongoose'
+import { cookiesOptions } from '../../../utils/helpers/index.js'
 
 export const login = async (req: Request, res: Response) => {
   const session = await mongoose.startSession()
@@ -71,10 +72,8 @@ export const login = async (req: Request, res: Response) => {
         refresh_token: refreshToken,
       }
     )
-    res.clearCookie('refreshAnonToken')
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-    })
+    await clearCookie(req, res)
+    res.cookie('refreshToken', refreshToken, cookiesOptions)
     await session.commitTransaction()
     session.endSession()
     return res.json({
@@ -112,9 +111,9 @@ export const logout = async (req: Request, res: Response) => {
 
     if (!user) {
       await clearCookie(req, res)
-      return res.status(401).json({
+      return res.status(406).json({
         error: {
-          code: 401,
+          code: 406,
           message: 'User not logged in',
         },
       })
@@ -153,7 +152,7 @@ export const register = async (req: Request, res: Response) => {
     if (user) {
       return res.status(400).json({
         code: 400,
-        message: 'User with username or username already exists',
+        message: 'User with username or email already exists',
       })
     }
     const hashPassword = await hashSync(password, genSaltSync(10))
@@ -179,11 +178,7 @@ export const register = async (req: Request, res: Response) => {
       expiresIn: REFRESH_TOKEN_EXPIRED || '7d',
     })
     res.clearCookie('refreshAnonToken')
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      // sameSite: 'none',
-      // secure: true,
-    })
+    res.cookie('refreshToken', refreshToken, cookiesOptions)
     await session.commitTransaction()
     session.endSession()
 
@@ -215,9 +210,7 @@ export const anonymousToken = async (req: Request, res: Response) => {
   })
 
   res.clearCookie('refreshToken')
-  res.cookie('refreshAnonToken', refreshToken, {
-    httpOnly: true,
-  })
+  res.cookie('refreshAnonToken', refreshToken, cookiesOptions)
 
   return res.json({
     role: tokenData.role,

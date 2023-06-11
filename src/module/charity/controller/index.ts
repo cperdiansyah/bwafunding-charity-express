@@ -7,7 +7,7 @@ import {
   RequestWithUserRole,
 } from '../model/charityInterface.js'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
-import { slugify } from '../../../utils/helpers/slug.js'
+import { slugify } from '../../../utils/helpers/index.js'
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity
