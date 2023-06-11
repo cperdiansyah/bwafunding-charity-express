@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import mongoose from 'mongoose'
 import Charity from '../model/index.js'
 import {
   IAcceptCharityData,
@@ -85,6 +86,8 @@ export const crateCharity = async (
   res: Response,
   next: NextFunction
 ) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
   try {
     let {
       title,
@@ -113,12 +116,16 @@ export const crateCharity = async (
     }
 
     const newCharity = await Charity.create(dataCharity)
+    await session.commitTransaction()
+    session.endSession()
 
     return res.status(200).json({
       status: 'success',
       content: newCharity,
     })
   } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
     return errorHandler(error, res)
   }
 }
@@ -131,6 +138,8 @@ export const updateCharity = async (
   res: Response,
   next: NextFunction
 ) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
   try {
     const { id } = req.params // ID of the charity to update
     const {
@@ -183,11 +192,15 @@ export const updateCharity = async (
       return res.status(200).json({ message: 'No changes made to the charity' })
     }
 
+    await session.commitTransaction()
+    session.endSession()
     return res.status(200).json({
       status: 'success',
       message: 'Charity updated successfully',
     })
   } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
     return errorHandler(error, res)
   }
 }
@@ -200,6 +213,8 @@ export const acceptCharity = async (
   res: Response,
   next: NextFunction
 ) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
   try {
     const { id } = req.params // ID of the charity to update
     const { status } = req.body // Updated data
@@ -224,12 +239,16 @@ export const acceptCharity = async (
     }
 
     await Charity.updateOne({ _id: id }, { $set: dataCharity })
+    await session.commitTransaction()
+    session.endSession()
 
     return res.status(200).json({
       status: 'success',
       message: 'Charity updated successfully',
     })
   } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
     return errorHandler(error, res)
   }
 }
@@ -242,6 +261,8 @@ export const deleteCharity = async (
   res: Response,
   next: NextFunction
 ) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
   try {
     const { id } = req.params
 
@@ -261,12 +282,16 @@ export const deleteCharity = async (
     }
 
     await Charity.deleteOne({ _id: id })
+    await session.commitTransaction()
+    session.endSession()
 
     return res.status(200).json({
       status: 'success',
       message: 'Charity deleted successfully',
     })
   } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
     return errorHandler(error, res)
   }
 }
