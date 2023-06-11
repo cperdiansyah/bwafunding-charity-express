@@ -19,7 +19,6 @@ dbConnect()
 if (process.env.NODE_ENV?.trim() === 'development') {
   app.use(morgan('dev'))
 }
-const port: number = PORT ? Number(PORT) : 3000
 
 const whitelist: string[] = [CORS_LOCAL, ...CORS_OPEN?.split(', ')]
 
@@ -80,6 +79,8 @@ app.use('/api/v1/charity', charityRoutes)
 if (NODE_ENV?.trim() === 'development') {
   app.use('/api/v1/seeder', seederRoutes)
 }
+
+const port: number = PORT ? Number(process.env.PORT) : 3000
 
 app.listen(port, `${process.env.HOST}`, () => {
   let log
