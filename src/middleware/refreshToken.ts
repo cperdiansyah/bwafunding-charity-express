@@ -4,10 +4,11 @@ import { Request, Response } from 'express'
 import User from '../module/user/model/index.js'
 import { errorHandler } from '../utils/helpers/errorHandler.js'
 import {
-  JWT_EXPIRES_IN,
-  JWT_SECRET,
-  REFRESH_TOKEN_SECRET,
+  ACCESS_TOKEN_EXPIRED,
+  JWT_ACCESS_TOKEN_SECRET,
+  JWT_REFRESH_TOKEN_SECRET,
 } from '../utils/index.js'
+
 import { ITokenPayload } from '../types/index.js'
 import { isEmpty } from '../utils/helpers/index.js'
 
@@ -63,7 +64,7 @@ export const refreshToken = async (req: Request, res: Response) => {
         })
       }
 
-      jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as ITokenPayload
+      jwt.verify(refreshToken, JWT_REFRESH_TOKEN_SECRET) as ITokenPayload
 
       const dataRefreshedToken: ITokenPayload = {
         id: user._id,
@@ -74,9 +75,13 @@ export const refreshToken = async (req: Request, res: Response) => {
         isAuthenticated: true,
       }
 
-      const accessToken = jwt.sign(dataRefreshedToken, JWT_SECRET, {
-        expiresIn: JWT_EXPIRES_IN || '20s',
-      })
+      const accessToken = jwt.sign(
+        dataRefreshedToken,
+        JWT_ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: ACCESS_TOKEN_EXPIRED || '20s',
+        }
+      )
       return res.json({ accessToken })
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
@@ -99,7 +104,7 @@ export const refreshAnonymousToken = async (req: Request, res: Response) => {
       })
     }
 
-    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as ITokenPayload
+    jwt.verify(refreshToken, JWT_REFRESH_TOKEN_SECRET) as ITokenPayload
 
     const dataRefreshedToken: ITokenPayload = {
       role: 'user',
@@ -107,8 +112,8 @@ export const refreshAnonymousToken = async (req: Request, res: Response) => {
       isAuthenticated: true,
     }
 
-    const accessToken = jwt.sign(dataRefreshedToken, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN || '20s',
+    const accessToken = jwt.sign(dataRefreshedToken, JWT_ACCESS_TOKEN_SECRET, {
+      expiresIn: ACCESS_TOKEN_EXPIRED || '20s',
     })
     return res.json({ accessToken })
   } catch (error) {

@@ -4,11 +4,10 @@ import jwt from 'jsonwebtoken'
 // import asyncHandler from 'express-async-handler'
 import User from '../../user/model/index.js'
 import {
-  JWT_COOKIE_EXPIRES_IN,
-  JWT_EXPIRES_IN,
-  JWT_SECRET,
-  REFRESH_TOKEN_SECRET,
-  JWT_COOKIE_EXPIRES_IN_MS,
+  JWT_ACCESS_TOKEN_SECRET,
+  ACCESS_TOKEN_EXPIRED,
+  JWT_REFRESH_TOKEN_SECRET,
+  REFRESH_TOKEN_EXPIRED,
 } from '../../../utils/index.js'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { IAnonymousToken, ITokenPayload } from '../../../types/index.js'
@@ -50,18 +49,18 @@ export const login = async (req: Request, res: Response) => {
       is_verified: user.is_verified,
     }
 
-    const accessToken = jwt.sign(userData, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN || '20s',
+    const accessToken = jwt.sign(userData, JWT_ACCESS_TOKEN_SECRET, {
+      expiresIn: ACCESS_TOKEN_EXPIRED || '20s',
     })
 
     let refreshToken
 
     if (!remember) {
-      refreshToken = jwt.sign(userData, REFRESH_TOKEN_SECRET, {
-        expiresIn: JWT_COOKIE_EXPIRES_IN || '1d',
+      refreshToken = jwt.sign(userData, JWT_REFRESH_TOKEN_SECRET, {
+        expiresIn: REFRESH_TOKEN_EXPIRED || '1d',
       })
     } else {
-      refreshToken = jwt.sign(userData, REFRESH_TOKEN_SECRET, {
+      refreshToken = jwt.sign(userData, JWT_REFRESH_TOKEN_SECRET, {
         expiresIn: '7d',
       })
     }
@@ -75,9 +74,6 @@ export const login = async (req: Request, res: Response) => {
     res.clearCookie('refreshAnonToken')
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      maxAge: eval(JWT_COOKIE_EXPIRES_IN_MS || `${24 * 60 * 60}`) * 1000,
-      // sameSite: 'none',
-      // secure: true,
     })
     await session.commitTransaction()
     session.endSession()
@@ -175,22 +171,16 @@ export const register = async (req: Request, res: Response) => {
       is_verified: newUser.is_verified,
     }
 
-    const accessToken = jwt.sign(userData, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN || '20s',
+    const accessToken = jwt.sign(userData, JWT_ACCESS_TOKEN_SECRET, {
+      expiresIn: ACCESS_TOKEN_EXPIRED || '20s',
     })
 
-    const refreshToken = jwt.sign(userData, REFRESH_TOKEN_SECRET, {
-      expiresIn: JWT_COOKIE_EXPIRES_IN || '7d',
+    const refreshToken = jwt.sign(userData, JWT_REFRESH_TOKEN_SECRET, {
+      expiresIn: REFRESH_TOKEN_EXPIRED || '7d',
     })
     res.clearCookie('refreshAnonToken')
     res.cookie('refreshToken', refreshToken, {
-      expires: new Date(
-        Date.now() +
-          eval(JWT_COOKIE_EXPIRES_IN_MS || `${7 * 24 * 60 * 60}`) * 1000
-      ),
       httpOnly: true,
-      // sameSite: 'none',
-      // secure: true,
     })
     await session.commitTransaction()
     session.endSession()
@@ -215,19 +205,16 @@ export const anonymousToken = async (req: Request, res: Response) => {
     is_verified: false,
   }
 
-  const accessToken = jwt.sign(tokenData, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN || '20s',
+  const accessToken = jwt.sign(tokenData, JWT_ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRED || '20s',
   })
-  const refreshToken = jwt.sign(tokenData, REFRESH_TOKEN_SECRET, {
-    expiresIn: JWT_COOKIE_EXPIRES_IN || '1d',
+  const refreshToken = jwt.sign(tokenData, JWT_REFRESH_TOKEN_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRED || '1d',
   })
 
   res.clearCookie('refreshToken')
   res.cookie('refreshAnonToken', refreshToken, {
     httpOnly: true,
-    maxAge: eval(JWT_COOKIE_EXPIRES_IN_MS || `${24 * 60 * 60}`) * 1000,
-    // sameSite: 'none',
-    // secure: true,
   })
 
   return res.json({

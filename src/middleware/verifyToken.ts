@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from '../utils/index.js'
+import { JWT_ACCESS_TOKEN_SECRET } from '../utils/index.js'
 import { CustomRequest } from './middleware.interface.js'
 import { ITokenPayload } from '../types/index.js'
 import User from '../module/user/model/index.js'
@@ -16,7 +16,10 @@ export const verifyToken = async (
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as ITokenPayload
+      const decoded = jwt.verify(
+        token,
+        JWT_ACCESS_TOKEN_SECRET
+      ) as ITokenPayload
       if (!decoded.isAuthenticated) {
         return res.status(403).json({
           error: {
@@ -57,7 +60,7 @@ export const verifyAnonymousToken = (
 
   if (token) {
     try {
-      jwt.verify(token, JWT_SECRET) as ITokenPayload
+      jwt.verify(token, JWT_ACCESS_TOKEN_SECRET) as ITokenPayload
       next()
     } catch (error: any) {
       return res.status(401).json({

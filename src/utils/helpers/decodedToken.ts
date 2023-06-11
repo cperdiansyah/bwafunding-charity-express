@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 import { Request, Response } from 'express'
-import { JWT_SECRET } from '../index.js'
+import { JWT_ACCESS_TOKEN_SECRET } from '../index.js'
 
 export const decodedToken = async (req: Request, res: Response) => {
   if (
@@ -19,7 +19,7 @@ export const decodedToken = async (req: Request, res: Response) => {
       })
     }
 
-    const decodedToken = jwt.verify(token, JWT_SECRET)
+    const decodedToken = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET)
 
     return decodedToken
   } else {
