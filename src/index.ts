@@ -81,7 +81,7 @@ if (NODE_ENV?.trim() === 'development') {
   app.use('/api/v1/seeder', seederRoutes)
 }
 
-app.listen(port, `0.0.0.0:${port}`, () => {
+app.listen(port, `${process.env.HOST}`, () => {
   let log
   if (NODE_ENV?.trim() === 'development') {
     log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${port}`
