@@ -4,6 +4,6 @@ import { postTempMedia } from '../controller/index.js'
 const router = express.Router()
 
 // Post Media
-router.route('/upload').post(postTempMedia)
+router.route('/upload').post([verifyAnonymousToken], postTempMedia)
 
 export default router

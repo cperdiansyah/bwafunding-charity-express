@@ -51,6 +51,9 @@ export const postTempMedia = (
     }).array('media_source')
 
     upload(req, res, async function (error) {
+      if (req.files?.length === 0 || req.files === undefined) {
+        return errorHandler('media_sources is required', res)
+      }
       if (error) {
         console.log(error)
         return errorHandler(error, res)
@@ -65,7 +68,7 @@ export const postTempMedia = (
 
         return res.status(200).json({
           status: 'success',
-          message: 'Media upload successfully',
+          message: 'Media sources upload successfully',
           url: fileUrls,
         })
       }
