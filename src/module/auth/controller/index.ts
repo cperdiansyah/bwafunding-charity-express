@@ -76,12 +76,14 @@ export const login = async (req: Request, res: Response) => {
     res.cookie('refreshToken', refreshToken, cookiesOptions)
     await session.commitTransaction()
     session.endSession()
-    return res.json({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      accessToken,
-    })
+    return res
+      .json({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        accessToken,
+      })
+      .end()
   } catch (error) {
     await session.abortTransaction()
     session.endSession()
