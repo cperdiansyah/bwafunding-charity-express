@@ -3,8 +3,15 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import cors from 'cors'
+import path from 'path'
 
-import { CORS_LOCAL, CORS_OPEN, NODE_ENV, PORT } from './utils/index.js'
+import {
+  CORS_LOCAL,
+  CORS_OPEN,
+  NODE_ENV,
+  PORT,
+  __dirname,
+} from './utils/index.js'
 import dbConnect from './config/database.js'
 dotenv.config()
 
@@ -12,9 +19,13 @@ dotenv.config()
 import seederRoutes from './module/seeder/routes/index.js'
 import authRoutes from './module/auth/routes/index.js'
 import charityRoutes from './module/charity/routes/index.js'
+import mediaRoutes from './module/media/routes/index.js'
 
 const app: Express = express()
 dbConnect()
+
+const uploadFolder = path.resolve(__dirname, 'storage')
+app.use('/storage', express.static(uploadFolder))
 
 if (process.env.NODE_ENV?.trim() === 'development') {
   app.use(morgan('dev'))
@@ -57,12 +68,12 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
     next(err)
   }
 })
+// app.use(express.static(__dirname))
 
 app.use(cookieParser())
 app.use(express.json())
 
 /* Routes */
-
 app.get('/', (req: Request, res: Response) => {
   res.send({
     message: 'Express + TypeScript Server is running',
@@ -74,6 +85,9 @@ app.use('/api/v1/auth', authRoutes)
 
 /* Charity router */
 app.use('/api/v1/charity', charityRoutes)
+
+/* Media router */
+app.use('/api/v1/media', mediaRoutes)
 
 // Seeder route
 if (NODE_ENV?.trim() === 'development') {
