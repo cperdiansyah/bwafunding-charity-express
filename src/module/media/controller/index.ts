@@ -51,20 +51,40 @@ export const postTempMedia = (
     }).array('media_source')
 
     upload(req, res, async function (error) {
+      const { multiple } = req.body
+
       if (req.files?.length === 0 || req.files === undefined) {
         return errorHandler('media_sources is required', res)
       }
+
+      if (
+        (multiple === 'false' || multiple === false) &&
+        Number(req?.files?.length || 0) > 1
+      ) {
+        return errorHandler('Send more than 1 file with multiple false', res)
+      }
+
       if (error) {
         console.log(error)
         return errorHandler(error, res)
       } else {
-        const fileUrls: string[] = (req.files as [])?.map(
-          (file: Express.Multer.File) => {
-            return `${req.protocol}://${req.get(
-              'host'
-            )}/${relativeUploadLocation}/${file.filename}`
-          }
-        )
+        // console.log(req.body)
+
+        let fileUrls: string[] | string = ''
+
+        fileUrls = (req.files as [])?.map((file: Express.Multer.File) => {
+          return `${req.protocol}://${req.get(
+            'host'
+          )}/${relativeUploadLocation}/${file.filename}`
+        })
+
+        if (
+          ((multiple === 'false' || multiple === false) &&
+            Number(req?.files?.length || 0) === 1) ||
+          Number(req?.files?.length || 0) === 1
+        ) {
+          fileUrls = fileUrls.join('')
+        }
 
         return res.status(200).json({
           status: 'success',
