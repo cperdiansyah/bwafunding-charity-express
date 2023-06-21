@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import path from 'path'
 
 dotenv.config()
 
@@ -13,3 +14,5 @@ export const {
   ACCESS_TOKEN_EXPIRED,
   REFRESH_TOKEN_EXPIRED,
 } = process.env
+
+export const __dirname = path.resolve()
