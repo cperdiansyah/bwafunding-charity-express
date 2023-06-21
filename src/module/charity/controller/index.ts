@@ -10,7 +10,7 @@ import {
   RequestWithUserRole,
 } from '../model/charityInterface.js'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
-import { slugify } from '../../../utils/helpers/slug.js'
+import { slugify } from '../../../utils/helpers/index.js'
 import path from 'path'
 import { __dirname } from '../../../utils/index.js'
 import multer from 'multer'

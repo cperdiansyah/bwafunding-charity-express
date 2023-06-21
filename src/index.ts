@@ -24,6 +24,8 @@ import mediaRoutes from './module/media/routes/index.js'
 const app: Express = express()
 dbConnect()
 
+const port: number = PORT ? Number(process.env.PORT) : 3000
+
 const uploadFolder = path.resolve(__dirname, 'storage')
 app.use('/storage', express.static(uploadFolder))
 
@@ -94,15 +96,12 @@ if (NODE_ENV?.trim() === 'development') {
   app.use('/api/v1/seeder', seederRoutes)
 }
 
-const port: number = PORT ? Number(process.env.PORT) : 3000
-const host = process.env.HOST || '0.0.0.0'
-
-app.listen(port, `${host}`, () => {
-  let log
+app.listen(port, '0.0.0.0', () => {
+  let log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on `
   if (NODE_ENV?.trim() === 'development') {
-    log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${port}`
+    log += `http://localhost:${port}`
   } else {
-    log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on ${port}`
+    log = `${port}`
   }
   console.log(log)
 })
