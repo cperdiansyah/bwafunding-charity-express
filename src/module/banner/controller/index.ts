@@ -77,6 +77,7 @@ export const crateBanner = async (
       content: newCharity,
     })
   } catch (error) {
+    console.log(error)
     await session.abortTransaction()
     session.endSession()
     return errorHandler(error, res)
@@ -136,19 +137,67 @@ export const updateBanner = async (
       redirection_link,
     }
 
-    const updatedBanner = await Banner.updateOne(
+    const result = await Banner.updateOne(
       { _id: id },
       { $set: dataBanner }
     )
-    if (updatedBanner.modifiedCount === 0) {
+    if (result.modifiedCount === 0) {
       return res.status(200).json({ message: 'No changes made to the charity' })
     }
+
+    // Retrieve the updated banner
+    const updatedBanner = await Banner.findById(id)
 
     await session.commitTransaction()
     session.endSession()
     return res.status(200).json({
       status: 'success',
-      message: 'Charity updated successfully',
+      message: 'Banner updated successfully',
+      content: updatedBanner,
+    })
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    return errorHandler(error, res)
+  }
+}
+
+
+// desc delete charity
+// @route delete /api/v1/charity/:id
+// @access Private
+export const deleteBanner = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const { id } = req.params
+
+    const charity = await Banner.findById(id)
+
+    const { role } = req.body.user
+
+    if (!charity) {
+      return res.status(404).json({ error: 'Banner not found' })
+    }
+
+    // Check if the user making the request is the author of the charity
+    if (role !== 'admin') {
+      return res
+        .status(403)
+        .json({ error: 'You are not authorized to delete this banner' })
+    }
+
+    await Banner.deleteOne({ _id: id })
+    await session.commitTransaction()
+    session.endSession()
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Banner deleted successfully',
     })
   } catch (error) {
     await session.abortTransaction()
