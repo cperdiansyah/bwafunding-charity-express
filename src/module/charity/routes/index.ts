@@ -6,6 +6,7 @@ import {
   getAllCharity,
   getCharityById,
   updateCharity,
+  uploadCharitymedia,
 } from '../controller/index.js'
 import {
   adminAndUserVerifiedAccess,
@@ -32,6 +33,8 @@ router
   .patch([verifyToken, adminAndUserVerifiedAccess], updateCharity)
 // accept charity
 router.route('/:id/status').patch([verifyToken, adminAccess], acceptCharity)
+// upload image
+router.route('/upload').post(uploadCharitymedia)
 
 // Delete Router
 router.route('/:id').delete([verifyToken, adminAccess], deleteCharity)

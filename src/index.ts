@@ -3,8 +3,15 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import cors from 'cors'
+import path from 'path'
 
-import { CORS_LOCAL, CORS_OPEN, NODE_ENV, PORT } from './utils/index.js'
+import {
+  CORS_LOCAL,
+  CORS_OPEN,
+  NODE_ENV,
+  PORT,
+  __dirname,
+} from './utils/index.js'
 import dbConnect from './config/database.js'
 dotenv.config()
 
@@ -12,9 +19,16 @@ dotenv.config()
 import seederRoutes from './module/seeder/routes/index.js'
 import authRoutes from './module/auth/routes/index.js'
 import charityRoutes from './module/charity/routes/index.js'
+import mediaRoutes from './module/media/routes/index.js'
+import bannerRoutes from './module/banner/routes/index.js'
 
 const app: Express = express()
 dbConnect()
+
+const port: number = PORT ? Number(process.env.PORT) : 3000
+
+const uploadFolder = path.resolve(__dirname, 'storage')
+app.use('/storage', express.static(uploadFolder))
 
 if (process.env.NODE_ENV?.trim() === 'development') {
   app.use(morgan('dev'))
@@ -57,12 +71,12 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
     next(err)
   }
 })
+// app.use(express.static(__dirname))
 
 app.use(cookieParser())
 app.use(express.json())
 
 /* Routes */
-
 app.get('/', (req: Request, res: Response) => {
   res.send({
     message: 'Express + TypeScript Server is running',
@@ -75,20 +89,23 @@ app.use('/api/v1/auth', authRoutes)
 /* Charity router */
 app.use('/api/v1/charity', charityRoutes)
 
+/* Banner router */
+app.use('/api/v1/banner', bannerRoutes)
+
+/* Media router */
+app.use('/api/v1/media', mediaRoutes)
+
 // Seeder route
 if (NODE_ENV?.trim() === 'development') {
   app.use('/api/v1/seeder', seederRoutes)
 }
 
-const port: number = PORT ? Number(process.env.PORT) : 3000
-const host = process.env.HOST || '0.0.0.0'
-
-app.listen(port, `${host}`, () => {
-  let log
+app.listen(port, '0.0.0.0', () => {
+  let log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on `
   if (NODE_ENV?.trim() === 'development') {
-    log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on http://localhost:${port}`
+    log += `http://localhost:${port}`
   } else {
-    log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on ${port}`
+    log = `${port}`
   }
   console.log(log)
 })

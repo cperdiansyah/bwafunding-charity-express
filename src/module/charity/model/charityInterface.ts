@@ -5,7 +5,7 @@ export interface ICharity {
   title: string
   slug: string
   description: string
-  status: 'accept' | 'inactive' | 'rejected'
+  status: 'accept' | 'inactive' | 'rejected' | 'completed'
   is_draft: boolean
   donation_target: number
   start_date: Date

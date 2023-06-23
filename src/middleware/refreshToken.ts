@@ -55,6 +55,8 @@ export const refreshToken = async (req: Request, res: Response) => {
         refresh_token: refreshToken,
       })
 
+      // console.log(user)
+
       if (!user) {
         return res.status(403).json({
           error: {

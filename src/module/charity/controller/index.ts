@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
+import axios from 'axios'
+import fs from 'fs'
+
 import Charity from '../model/index.js'
 import {
   IAcceptCharityData,
@@ -7,7 +10,10 @@ import {
   RequestWithUserRole,
 } from '../model/charityInterface.js'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
-import { slugify } from '../../../utils/helpers/slug.js'
+import { slugify } from '../../../utils/helpers/index.js'
+import path from 'path'
+import { __dirname } from '../../../utils/index.js'
+import multer from 'multer'
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity
@@ -25,6 +31,7 @@ export const getAllCharity = async (
     const totalPages = Math.ceil(totalCount / rows)
 
     const charities: ICharity[] = await Charity.find({})
+      .sort({ createdAt: -1 })
       .skip((page - 1) * rows)
       .limit(rows)
       .populate({
@@ -98,6 +105,7 @@ export const crateCharity = async (
       status = 'inactive',
       is_draft = true,
       post_date = null,
+      media_content,
     } = req.body
 
     const { id: userId } = req.body.user
@@ -113,6 +121,7 @@ export const crateCharity = async (
       is_draft,
       status,
       post_date,
+      media: media_content,
     }
 
     const newCharity = await Charity.create(dataCharity)
@@ -294,4 +303,51 @@ export const deleteCharity = async (
     session.endSession()
     return errorHandler(error, res)
   }
+}
+
+// const upload = multer({ dest: relativeUploadLocation })
+
+export const uploadCharitymedia = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const relativeUploadLocation = 'storage/charity'
+  const uploadFolder = path.resolve(__dirname, relativeUploadLocation)
+
+  if (!fs.existsSync(uploadFolder)) {
+    fs.mkdirSync(uploadFolder, { recursive: true })
+  }
+
+  const upload = multer({ dest: relativeUploadLocation }).array('files')
+
+  upload(req, res, async function (error) {
+    try {
+      const urls = req.body.urls
+      // Array to store the uploaded file URLs
+      const uploadedUrls: string[] = []
+
+      for (const url of urls) {
+        // Download the file from the provided URL
+        const response = await axios.get(url, { responseType: 'arraybuffer' })
+        const rawFilename = response.request.path.split('/')
+
+        // Generate a unique filename for the uploaded file (optional)
+        const filename = `${Date.now()}-${rawFilename[rawFilename.length - 1]}`
+
+        // Write the downloaded file to the uploads folder
+        const filePath = `${relativeUploadLocation}/${filename}`
+
+        fs.writeFileSync(filePath, response.data)
+
+        // Store the uploaded file's URL
+        uploadedUrls.push(`${req.protocol}://${req.get('host')}/${filePath}`)
+      }
+      // Return the uploaded file URLs
+      res.json({ uploadedUrls })
+    } catch (error) {
+      console.error('Error uploading files:', error)
+      res.status(500).json({ error: 'Failed to upload files' })
+    }
+  })
 }
