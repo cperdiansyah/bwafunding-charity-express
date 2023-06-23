@@ -105,7 +105,7 @@ export const crateCharity = async (
       status = 'inactive',
       is_draft = true,
       post_date = null,
-      media_content,
+      media,
     } = req.body
 
     const { id: userId } = req.body.user
@@ -121,7 +121,7 @@ export const crateCharity = async (
       is_draft,
       status,
       post_date,
-      media: media_content,
+      media,
     }
 
     const newCharity = await Charity.create(dataCharity)
@@ -345,9 +345,19 @@ export const uploadCharitymedia = async (
       }
       // Return the uploaded file URLs
       res.json({ uploadedUrls })
-    } catch (error) {
-      console.error('Error uploading files:', error)
-      res.status(500).json({ error: 'Failed to upload files' })
+    } catch (error: any) {
+      const status = error.response.status
+      // console.error('Error uploading files:', error)
+
+      if (status === 404) {
+        return res.status(404).json({
+          error: {
+            code: 404,
+            message: 'Image Url not found',
+          },
+        })
+      }
+      return res.status(500).json({ error: 'Failed to upload files' })
     }
   })
 }
