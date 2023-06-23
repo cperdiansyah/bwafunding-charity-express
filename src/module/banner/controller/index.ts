@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import Banner from '../model/index.js'
+import { IBanner } from '../model/banner.interface.js'
 
 // @desc Fetch all banners
 // @route GET /api/v1/banner
@@ -12,8 +13,30 @@ export const getAllBanner = async (
   next: NextFunction
 ) => {
   try {
+    const page = parseInt(req.query.page as string) || 1
+    const rows = parseInt(req.query.rows as string) || 10
+
+    const totalCount = await Banner.countDocuments({})
+    const totalPages = Math.ceil(totalCount / rows)
+
+    const charities: IBanner[] = await Banner.find({})
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * rows)
+      .limit(rows)
+      .populate({
+        path: 'author',
+        select: 'name',
+      })
+      .select('-__v')
+      .exec()
     return res.status(200).json({
-      status: 'success',
+      charity: charities,
+      meta: {
+        page,
+        rows,
+        totalPages,
+        total: totalCount,
+      },
     })
   } catch (error) {
     return errorHandler(error, res)
@@ -29,6 +52,23 @@ export const getBannerById = async (
   next: NextFunction
 ) => {
   try {
+    const charity: IBanner | null = await Banner.findById(req.params.id)
+      .populate({
+        path: 'author',
+        select: 'name',
+      })
+      .select('-__v')
+    if (charity === null) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Charity not found',
+        },
+      })
+    }
+    return res.status(200).json({
+      charity: charity,
+    })
   } catch (error) {
     return errorHandler(error, res)
   }
@@ -137,10 +177,7 @@ export const updateBanner = async (
       redirection_link,
     }
 
-    const result = await Banner.updateOne(
-      { _id: id },
-      { $set: dataBanner }
-    )
+    const result = await Banner.updateOne({ _id: id }, { $set: dataBanner })
     if (result.modifiedCount === 0) {
       return res.status(200).json({ message: 'No changes made to the charity' })
     }
@@ -161,7 +198,6 @@ export const updateBanner = async (
     return errorHandler(error, res)
   }
 }
-
 
 // desc delete charity
 // @route delete /api/v1/charity/:id
