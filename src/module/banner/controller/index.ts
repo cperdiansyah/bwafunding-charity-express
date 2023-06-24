@@ -87,7 +87,7 @@ export const crateBanner = async (
   try {
     const {
       title,
-      content,
+      // content,
       status,
       start_date,
       end_date,
@@ -100,7 +100,7 @@ export const crateBanner = async (
     const dataBanner = {
       author: userId,
       title,
-      content,
+      // content,
       status,
       start_date,
       end_date,

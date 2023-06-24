@@ -2,7 +2,7 @@ import { Types } from 'mongoose'
 
 export interface IBanner {
   title: string
-  content: string
+  // content: string
   redirection_link: string
   image: string
   start_date: Date | null
