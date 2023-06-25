@@ -7,5 +7,5 @@ export interface IBanner {
   start_date: Date | null
   end_date: Date | null
   status: 'active' | 'inactive' | 'pending'
-  author: Types.ObjectId | null
+  author?: Types.ObjectId | null
 }

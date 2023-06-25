@@ -44,8 +44,8 @@ const charities: ICharity[] = [
     is_draft: false,
     donation_target: 2000,
     start_date: new Date('2023-09-01'),
-    end_date: null,
-    post_date: new Date('2023-06-01'),
+    end_date: new Date('2023-09-10'),
+    post_date: new Date('2023-09-02'),
     author: null,
   },
   {

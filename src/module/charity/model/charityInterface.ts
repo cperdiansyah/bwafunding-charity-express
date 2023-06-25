@@ -11,7 +11,7 @@ export interface ICharity {
   start_date: Date
   end_date: Date | null
   post_date: Date | null
-  author: Types.ObjectId | null
+  author?: Types.ObjectId | null
   media?: ICharityMedia[] | null
 }
 
