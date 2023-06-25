@@ -44,10 +44,10 @@ export const refreshToken = async (req: Request, res: Response) => {
     try {
       const refreshToken = req.cookies.refreshToken
       if (!refreshToken) {
-        return res.status(401).json({
+        return res.status(403).json({
           error: {
-            code: 401,
-            message: 'Unauthorized',
+            code: 403,
+            message: 'Forbidden : Token is required',
           },
         })
       }

@@ -11,6 +11,13 @@ const users: IUser[] = [
     role: 'admin',
   },
   {
+    name: 'Developer',
+    username: 'admindev',
+    email: 'admindev@example.com',
+    password: hashSync('123456', genSaltSync(10)),
+    role: 'admin',
+  },
+  {
     name: 'John Doe',
     username: 'jhon',
     email: 'john@example.com',

@@ -9,11 +9,15 @@ import charities from '../../../data/charity.js'
 // Model
 import User from '../../user/model/index.js'
 import Charity from '../../charity/model/index.js'
+import banners from '../../../data/banner.js'
+import { IBanner } from '../../banner/model/banner.interface.js'
+import Banner from '../../banner/model/index.js'
 
 export const importData = async (req: Request, res: Response) => {
   try {
     await User.deleteMany({})
     await Charity.deleteMany({})
+    await Banner.deleteMany({})
 
     const createdUsers = await User.insertMany(users)
     const adminUser = createdUsers[0]._id
@@ -22,6 +26,13 @@ export const importData = async (req: Request, res: Response) => {
       ...charity,
       author: new Types.ObjectId(adminUser),
     }))
+
+    const mappedBanners = banners.map((banner: IBanner) => ({
+      ...banner,
+      author: new Types.ObjectId(adminUser),
+    }))
+
+    await Banner.insertMany(mappedBanners)
 
     await Charity.insertMany(mappedCharity)
 

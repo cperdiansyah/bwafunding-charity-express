@@ -102,10 +102,10 @@ export const crateCharity = async (
       donation_target,
       start_date,
       end_date,
-      status = 'inactive',
+      status = 'pending',
       is_draft = true,
       post_date = null,
-      media_content,
+      media,
     } = req.body
 
     const { id: userId } = req.body.user
@@ -121,7 +121,7 @@ export const crateCharity = async (
       is_draft,
       status,
       post_date,
-      media: media_content,
+      media,
     }
 
     const newCharity = await Charity.create(dataCharity)
@@ -158,10 +158,10 @@ export const updateCharity = async (
       start_date,
       end_date,
       is_draft,
+      media,
     } = req.body // Updated data
 
-    const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
-
+    const { id: userId, role: userRole } = req.body.user // Assuming user ID is retrieved from the JWT token
     // Find the charity by ID and check if the author matches the user ID
     const existingCharity = await Charity.findById(id)
     if (!existingCharity) {
@@ -171,7 +171,10 @@ export const updateCharity = async (
     }
 
     // Check if the user making the request is the author of the charity
-    if (existingCharity?.author?.toString() !== userId) {
+    if (
+      existingCharity?.author?.toString() !== userId &&
+      userRole !== 'admin'
+    ) {
       return res.status(403).json({
         error: {
           code: 403,
@@ -182,7 +185,6 @@ export const updateCharity = async (
 
     const dataCharity: ICharity = {
       slug: slugify(title),
-      author: userId,
       title,
       description,
       donation_target,
@@ -191,6 +193,7 @@ export const updateCharity = async (
       is_draft,
       post_date: existingCharity.post_date,
       status: existingCharity.status,
+      media,
     }
 
     const updatedCharity = await Charity.updateOne(
@@ -345,9 +348,19 @@ export const uploadCharitymedia = async (
       }
       // Return the uploaded file URLs
       res.json({ uploadedUrls })
-    } catch (error) {
-      console.error('Error uploading files:', error)
-      res.status(500).json({ error: 'Failed to upload files' })
+    } catch (error: any) {
+      const status = error.response.status
+      // console.error('Error uploading files:', error)
+
+      if (status === 404) {
+        return res.status(404).json({
+          error: {
+            code: 404,
+            message: 'Image Url not found',
+          },
+        })
+      }
+      return res.status(500).json({ error: 'Failed to upload files' })
     }
   })
 }
