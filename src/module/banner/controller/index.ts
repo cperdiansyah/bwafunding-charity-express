@@ -19,7 +19,7 @@ export const getAllBanner = async (
     const totalCount = await Banner.countDocuments({})
     const totalPages = Math.ceil(totalCount / rows)
 
-    const charities: IBanner[] = await Banner.find({})
+    const banners: IBanner[] = await Banner.find({})
       .sort({ createdAt: -1 })
       .skip((page - 1) * rows)
       .limit(rows)
@@ -30,7 +30,7 @@ export const getAllBanner = async (
       .select('-__v')
       .exec()
     return res.status(200).json({
-      charity: charities,
+      banner: banners,
       meta: {
         page,
         rows,
@@ -52,22 +52,22 @@ export const getBannerById = async (
   next: NextFunction
 ) => {
   try {
-    const charity: IBanner | null = await Banner.findById(req.params.id)
+    const banner: IBanner | null = await Banner.findById(req.params.id)
       .populate({
         path: 'author',
         select: 'name',
       })
       .select('-__v')
-    if (charity === null) {
+    if (banner === null) {
       return res.status(404).json({
         error: {
           code: 404,
-          message: 'Charity not found',
+          message: 'Banner not found',
         },
       })
     }
     return res.status(200).json({
-      charity: charity,
+      banner,
     })
   } catch (error) {
     return errorHandler(error, res)
@@ -87,7 +87,7 @@ export const crateBanner = async (
   try {
     const {
       title,
-      content,
+      // content,
       status,
       start_date,
       end_date,
@@ -100,7 +100,7 @@ export const crateBanner = async (
     const dataBanner = {
       author: userId,
       title,
-      content,
+      // content,
       status,
       start_date,
       end_date,

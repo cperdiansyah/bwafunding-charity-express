@@ -5,13 +5,13 @@ export interface ICharity {
   title: string
   slug: string
   description: string
-  status: 'accept' | 'inactive' | 'rejected' | 'completed'
+  status: 'accept' | 'pending' | 'rejected' | 'completed'
   is_draft: boolean
   donation_target: number
   start_date: Date
   end_date: Date | null
   post_date: Date | null
-  author: Types.ObjectId | null
+  author?: Types.ObjectId | null
   media?: ICharityMedia[] | null
 }
 
@@ -25,6 +25,6 @@ export interface RequestWithUserRole extends Request {
 }
 
 export interface IAcceptCharityData {
-  status: 'accept' | 'inactive' | 'rejected'
+  status: 'accept' | 'pending' | 'rejected'
   post_date?: Date | number | null
 }

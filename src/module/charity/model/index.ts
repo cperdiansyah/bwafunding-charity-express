@@ -38,7 +38,7 @@ const charitySchema: Schema<ICharity> = new mongoose.Schema(
     status: {
       type: String,
       required: [true, 'status is required'],
-      default: 'inactive',
+      default: 'pending',
     },
     is_draft: {
       type: Boolean,
