@@ -14,7 +14,7 @@ const bannerSchema: Schema<IBanner> = new mongoose.Schema(
     status: {
       type: String,
       required: [true, 'status is required'],
-      default: 'inactive',
+      default: 'pending',
     },
     start_date: {
       type: Date,

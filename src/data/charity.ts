@@ -16,7 +16,7 @@ const charities: ICharity[] = [
     title: 'Charity 2',
     slug: 'charity-2',
     description: 'This is the second charity description.',
-    status: 'inactive',
+    status: 'pending',
     is_draft: true,
     donation_target: 10000,
     start_date: new Date('2023-08-01'),

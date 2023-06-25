@@ -4,6 +4,13 @@ import { IUser } from '../module/user/model/userInterface.js'
 
 const users: IUser[] = [
   {
+    name: 'Developer',
+    username: 'admindev',
+    email: 'admindev@example.com',
+    password: hashSync('123456', genSaltSync(10)),
+    role: 'admin',
+  },
+  {
     name: 'Admin User',
     username: 'admin',
     email: 'admin@example.com',

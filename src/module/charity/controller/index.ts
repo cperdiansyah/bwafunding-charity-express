@@ -102,7 +102,7 @@ export const crateCharity = async (
       donation_target,
       start_date,
       end_date,
-      status = 'inactive',
+      status = 'pending',
       is_draft = true,
       post_date = null,
       media,
