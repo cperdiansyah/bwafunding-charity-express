@@ -29,9 +29,12 @@ export const getAllCharity = async (
 
     const totalCount = await Charity.countDocuments({})
     const totalPages = Math.ceil(totalCount / rows)
+    const currentDate = new Date()
 
-    const charities: ICharity[] = await Charity.find({})
-      .sort({ createdAt: -1 })
+    const charities: ICharity[] = await Charity.find({
+      end_date: { $gte: currentDate },
+    })
+      .sort({ end_date: 1 })
       .skip((page - 1) * rows)
       .limit(rows)
       .populate({
