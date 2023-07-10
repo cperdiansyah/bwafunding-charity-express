@@ -8,7 +8,7 @@ import {
 
 export const processTransaction = async (req: Request, res: Response) => {
   try {
-    const { transaction, user, items } = req.body
+    const { transaction, user, items, transaction_type } = req.body
     const snap = new MidtransClient.Snap({
       isProduction: false,
       serverKey: MIDTRANS_SERVER_KEY,
