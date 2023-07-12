@@ -52,8 +52,7 @@ export const getAllCharityPayment = async (
     return errorHandler(error, res)
   }
 }
-
-// desc create charity payment detail
+// desc get charity payment detail
 // @route GET /api/v1/payment/charity/:id
 // @access Private
 export const getPaymentById = async (
@@ -83,6 +82,89 @@ export const getPaymentById = async (
     return errorHandler(error, res)
   }
 }
+
+// desc get Payment by id charity
+// @route GET /api/v1/payment/charity/list
+// @access Private
+export const gePaymentByIdCharity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1
+    const rows = parseInt(req.query.rows as string) || 10
+
+    const totalCount = await Charity.countDocuments({})
+    const totalPages = Math.ceil(totalCount / rows)
+    // const currentDate = new Date()
+
+    const payment = await PaymentCampaign.find({ id_charity: req.params.id })
+      .sort({ createdAt: 1 })
+      .skip((page - 1) * rows)
+      .limit(rows)
+      // .populate('id_user')
+      .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+      .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+      .select('-__v')
+      .exec()
+
+    return res.status(200).json({
+      campaignPayment: payment,
+      meta: {
+        page,
+        rows,
+        totalPages,
+        total: totalCount,
+      },
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+// desc create Payment by id user
+// @route GET /api/v1/payment/charity/list
+// @access Private
+export const gePaymentByIdUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1
+    const rows = parseInt(req.query.rows as string) || 10
+
+    const totalCount = await Charity.countDocuments({})
+    const totalPages = Math.ceil(totalCount / rows)
+    // const currentDate = new Date()
+
+    const payment = await PaymentCampaign.find({ id_user: req.params.id })
+      .sort({ createdAt: 1 })
+      .skip((page - 1) * rows)
+      .limit(rows)
+      // .populate('id_user')
+      .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+      .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+      .select('-__v')
+      .exec()
+
+    return res.status(200).json({
+      campaignPayment: payment,
+      meta: {
+        page,
+        rows,
+        totalPages,
+        total: totalCount,
+      },
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
+
 
 // desc create charity payment
 // @route POST /api/v1/payment/charity/create transactions
@@ -311,6 +393,67 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
     return res.status(200).json({
       status: 'success',
       message: 'payment campaign updated successfully',
+      content: updatedCampaign,
+    })
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    return errorHandler(error, res)
+  }
+}
+
+// desc update status payment
+// @route POST /api/v1/payment/charity/update transactions
+// @access Private
+export const updateStatusTransaction = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const { id } = req.params // ID of the charity to update
+    const { id_user, status } = req.body
+
+    const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
+
+    // Find the charity by ID and check if the author matches the user ID
+    const existingPaymentCampaign = await PaymentCampaign.findById(id)
+    if (!existingPaymentCampaign) {
+      return res
+        .status(404)
+        .json({ error: { code: 404, message: 'Payment Campaign not found' } })
+    }
+
+    // Check if the user making the request is the author of the banner
+    if (existingPaymentCampaign?.id_user?.toString() !== userId) {
+      return res.status(403).json({
+        error: {
+          code: 403,
+          message: 'You are not authorized to update this campaign',
+        },
+      })
+    }
+
+    const dataPayment: IPaymentCampaign = {
+      id_user,
+      status,
+    }
+
+    const updatedPaymentCampaign = await PaymentCampaign.updateOne(
+      { _id: id },
+      { $set: dataPayment }
+    )
+    if (updatedPaymentCampaign.modifiedCount === 0) {
+      return res
+        .status(200)
+        .json({ message: 'No changes made to the payment campaign' })
+    }
+    // Retrieve the updated campaign
+    const updatedCampaign = await PaymentCampaign.findById(id)
+
+    await session.commitTransaction()
+    session.endSession()
+    return res.status(200).json({
+      status: 'success',
+      message: 'status campaign updated successfully',
       content: updatedCampaign,
     })
   } catch (error) {
