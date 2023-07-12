@@ -21,6 +21,8 @@ import authRoutes from './module/auth/routes/index.js'
 import charityRoutes from './module/charity/routes/index.js'
 import mediaRoutes from './module/media/routes/index.js'
 import bannerRoutes from './module/banner/routes/index.js'
+import generalPaymentRoutes from './module/payment/general/routes/index.js'
+import campaignPaymentRoutes from './module/payment/charity/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -94,6 +96,10 @@ app.use('/api/v1/banner', bannerRoutes)
 
 /* Media router */
 app.use('/api/v1/media', mediaRoutes)
+
+/* Payment Router */
+app.use('/api/v1/payment/general', generalPaymentRoutes)
+app.use('/api/v1/payment/charity', campaignPaymentRoutes)
 
 // Seeder route
 if (NODE_ENV?.trim() === 'development') {

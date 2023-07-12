@@ -5,6 +5,7 @@ import {
   deleteCharity,
   getAllCharity,
   getCharityById,
+  getCharityBySlug,
   updateCharity,
   uploadCharitymedia,
 } from '../controller/index.js'
@@ -22,6 +23,7 @@ const router = express.Router()
 // Get Router
 router.route('/').get([verifyAnonymousToken], getAllCharity)
 router.route('/:id').get([verifyAnonymousToken], getCharityById)
+router.route('/slug/:id').get([verifyAnonymousToken], getCharityBySlug)
 
 // Post Router
 router.route('/').post([verifyToken, adminAndUserVerifiedAccess], crateCharity)
