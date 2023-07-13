@@ -25,7 +25,11 @@ export const getAllCharityPayment = async (
 ) => {
   try {
     const { getAll } = req.query
-    const totalCount = await Charity.countDocuments({})
+    const query: any = {}
+    if (req.query.status) {
+      query.status = req.query.status
+    }
+    const totalCount = await PaymentCampaign.countDocuments(query)
 
     if (!getAll) {
       const page = parseInt(req.query.page as string) || 1
@@ -33,7 +37,7 @@ export const getAllCharityPayment = async (
 
       const totalPages = Math.ceil(totalCount / rows)
 
-      const payment = await PaymentCampaign.find({})
+      const payment = await PaymentCampaign.find(query)
         .sort({ createdAt: 1 })
         .skip((page - 1) * rows)
         .limit(rows)
@@ -43,6 +47,8 @@ export const getAllCharityPayment = async (
 
         .select('-__v')
         .exec()
+
+      // const total = payment.
 
       return res.status(200).json({
         campaignPayment: payment,
@@ -54,7 +60,7 @@ export const getAllCharityPayment = async (
         },
       })
     } else {
-      const payment = await PaymentCampaign.find({})
+      const payment = await PaymentCampaign.find(query)
         .sort({ createdAt: 1 })
 
         // .populate('id_user')
@@ -116,7 +122,14 @@ export const gePaymentByIdCharity = async (
 ) => {
   try {
     const { getAll } = req.query
-    const totalCount = await Charity.countDocuments({})
+
+    const query: any = {
+      id_charity: req.params.id,
+    }
+    if (req.query.status) {
+      query.status = req.query.status
+    }
+    const totalCount = await PaymentCampaign.countDocuments(query)
 
     if (!getAll) {
       const page = parseInt(req.query.page as string) || 1
@@ -125,7 +138,7 @@ export const gePaymentByIdCharity = async (
       const totalPages = Math.ceil(totalCount / rows)
       // const currentDate = new Date()
 
-      const payment = await PaymentCampaign.find({ id_charity: req.params.id })
+      const payment = await PaymentCampaign.find(query)
         .sort({ createdAt: 1 })
         .skip((page - 1) * rows)
         .limit(rows)
@@ -146,7 +159,7 @@ export const gePaymentByIdCharity = async (
         },
       })
     } else {
-      const payment = await PaymentCampaign.find({ id_charity: req.params.id })
+      const payment = await PaymentCampaign.find(query)
         .sort({ createdAt: 1 })
         // .populate('id_user')
         .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
@@ -176,7 +189,14 @@ export const getPaymentByIdUser = async (
 ) => {
   try {
     const { getAll } = req.query
-    const totalCount = await Charity.countDocuments({})
+    const query: any = {
+      id_user: req.params.id,
+    }
+    if (req.query.status) {
+      query.status = req.query.status
+    }
+    const totalCount = await PaymentCampaign.countDocuments(query)
+
     if (!getAll) {
       const page = parseInt(req.query.page as string) || 1
       const rows = parseInt(req.query.rows as string) || 10
@@ -184,7 +204,7 @@ export const getPaymentByIdUser = async (
       const totalPages = Math.ceil(totalCount / rows)
       // const currentDate = new Date()
 
-      const payment = await PaymentCampaign.find({ id_user: req.params.id })
+      const payment = await PaymentCampaign.find(query)
         .sort({ createdAt: 1 })
         .skip((page - 1) * rows)
         .limit(rows)
@@ -205,7 +225,7 @@ export const getPaymentByIdUser = async (
         },
       })
     } else {
-      const payment = await PaymentCampaign.find({ id_user: req.params.id })
+      const payment = await PaymentCampaign.find(query)
         .sort({ createdAt: 1 })
         // .populate('id_user')
         .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
