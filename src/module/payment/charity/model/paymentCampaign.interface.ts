@@ -1,7 +1,7 @@
 import { Types } from 'mongoose'
 
 export interface IPaymentCampaign {
-  id_user: Types.ObjectId
+  id_user?: Types.ObjectId
   id_charity?: Types.ObjectId
   status?: 'process' | 'pending' | 'paid' | 'failure' | 'cancel'
   quantity?: number

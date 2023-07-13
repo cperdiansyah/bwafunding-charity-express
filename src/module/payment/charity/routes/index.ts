@@ -5,6 +5,7 @@ import {
   gePaymentByIdUser,
   getAllCharityPayment,
   getPaymentById,
+  updateMidtransResponse,
   updateStatusTransaction,
   updateTransaction,
 } from '../controller/index.js'
@@ -21,7 +22,7 @@ router.route('/create-transaction').post(createTransaction)
 // Patch Router
 // update payment transaction
 router.route('/update-transaction/:id').patch(updateTransaction)
-router.route('/add-midtrans-response/:id').patch(updateTransaction)
+router.route('/add-midtrans-response/:id').patch(updateMidtransResponse)
 router.route('/update-status/:id').patch(updateStatusTransaction)
 
 export default router

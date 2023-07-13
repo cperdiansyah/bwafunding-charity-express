@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+
 import _isEmpty from 'lodash/isEmpty.js'
+dotenv.config()
 
 /* Interface */
 import { IPaymentCampaign } from '../model/paymentCampaign.interface.js'
@@ -164,8 +167,6 @@ export const gePaymentByIdUser = async (
   }
 }
 
-
-
 // desc create charity payment
 // @route POST /api/v1/payment/charity/create transactions
 // @access Private
@@ -223,8 +224,48 @@ export const createTransaction = async (req: Request, res: Response) => {
       quantity,
       amount,
       status: 'process',
+
+      /* Create payment campaign */
     }
     const paymentCampaign = await PaymentCampaign.create(dataPayment)
+
+    /* Create Midtrans Payment */
+    const clientHost =
+      process.env.NODE_ENV?.trim() === 'development'
+        ? process.env.CORS_LOCAL
+        : process.env.CORS_OPEN
+
+    const resMidtrans = await api.post(
+      `${SERVICE.PaymentGeneral}/process-transaction`,
+      {
+        transaction: {
+          id: paymentCampaign._id,
+          amount: paymentCampaign.amount,
+        },
+        user: {
+          first_name: user.name.split(' ')[0],
+          last_name: user.name.split(' ')[1],
+          email: user.email,
+        },
+        items: [
+          {
+            id: charity._id,
+            price: paymentCampaign.amount,
+            quantity: 1,
+            name: charity.title,
+            url: `${clientHost}/campaign/${charity.slug}`,
+          },
+        ],
+      }
+    )
+    const dataMidtransResponse = await resMidtrans.data.data
+    await api.patch(
+      `${SERVICE.PaymentCharity}/add-midtrans-response/${paymentCampaign._id}`,
+      {
+        response_midtrans: dataMidtransResponse,
+        id_user,
+      }
+    )
 
     /* Get populated data */
     const getPayment = await api.get(
@@ -240,8 +281,9 @@ export const createTransaction = async (req: Request, res: Response) => {
       message: 'Payment campaign created successfully',
       content: { ...payment },
     })
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
+    // console.log(error)
+    // console.log(error.message)
     await session.abortTransaction()
     session.endSession()
     return errorHandler(error, res)
@@ -351,7 +393,7 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
     const { id } = req.params // ID of the charity to update
     const { id_user, response_midtrans } = req.body
 
-    const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
+    // const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
 
     // Find the charity by ID and check if the author matches the user ID
     const existingPaymentCampaign = await PaymentCampaign.findById(id)
@@ -362,7 +404,7 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
     }
 
     // Check if the user making the request is the author of the banner
-    if (existingPaymentCampaign?.id_user?.toString() !== userId) {
+    if (existingPaymentCampaign?.id_user?.toString() !== id_user) {
       return res.status(403).json({
         error: {
           code: 403,
@@ -372,9 +414,10 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
     }
 
     const dataPayment: IPaymentCampaign = {
-      id_user,
+      // id_user,
       response_midtrans,
     }
+    console.log(response_midtrans)
 
     const updatedPaymentCampaign = await PaymentCampaign.updateOne(
       { _id: id },
@@ -396,6 +439,7 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
       content: updatedCampaign,
     })
   } catch (error) {
+    console.log(error)
     await session.abortTransaction()
     session.endSession()
     return errorHandler(error, res)
