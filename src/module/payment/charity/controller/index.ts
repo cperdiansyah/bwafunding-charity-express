@@ -24,10 +24,13 @@ export const getAllCharityPayment = async (
   next: NextFunction
 ) => {
   try {
-    const { getAll } = req.query
+    const { getAll, id_charities } = req.query
     const query: any = {}
     if (req.query.status) {
       query.status = req.query.status
+    }
+    if (id_charities) {
+      query.id_charity = { $in: id_charities }
     }
     const totalCount = await PaymentCampaign.countDocuments(query)
 
