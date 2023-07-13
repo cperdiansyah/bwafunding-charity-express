@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+
 import _isEmpty from 'lodash/isEmpty.js'
+dotenv.config()
 
 /* Interface */
 import { IPaymentCampaign } from '../model/paymentCampaign.interface.js'
@@ -21,33 +24,59 @@ export const getAllCharityPayment = async (
   next: NextFunction
 ) => {
   try {
-    const page = parseInt(req.query.page as string) || 1
-    const rows = parseInt(req.query.rows as string) || 10
+    const { getAll } = req.query
+    const query: any = {}
+    if (req.query.status) {
+      query.status = req.query.status
+    }
+    const totalCount = await PaymentCampaign.countDocuments(query)
 
-    const totalCount = await Charity.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
-    // const currentDate = new Date()
+    if (!getAll) {
+      const page = parseInt(req.query.page as string) || 1
+      const rows = parseInt(req.query.rows as string) || 10
 
-    const payment = await PaymentCampaign.find({})
-      .sort({ createdAt: 1 })
-      .skip((page - 1) * rows)
-      .limit(rows)
-      // .populate('id_user')
-      .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
-      .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+      const totalPages = Math.ceil(totalCount / rows)
 
-      .select('-__v')
-      .exec()
+      const payment = await PaymentCampaign.find(query)
+        .sort({ createdAt: 1 })
+        .skip((page - 1) * rows)
+        .limit(rows)
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
 
-    return res.status(200).json({
-      campaignPayment: payment,
-      meta: {
-        page,
-        rows,
-        totalPages,
-        total: totalCount,
-      },
-    })
+        .select('-__v')
+        .exec()
+
+      // const total = payment.
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          page,
+          rows,
+          totalPages,
+          total: totalCount,
+        },
+      })
+    } else {
+      const payment = await PaymentCampaign.find(query)
+        .sort({ createdAt: 1 })
+
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          total: totalCount,
+        },
+      })
+    }
   } catch (error) {
     return errorHandler(error, res)
   }
@@ -92,33 +121,60 @@ export const gePaymentByIdCharity = async (
   next: NextFunction
 ) => {
   try {
-    const page = parseInt(req.query.page as string) || 1
-    const rows = parseInt(req.query.rows as string) || 10
+    const { getAll } = req.query
 
-    const totalCount = await Charity.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
-    // const currentDate = new Date()
+    const query: any = {
+      id_charity: req.params.id,
+    }
+    if (req.query.status) {
+      query.status = req.query.status
+    }
+    const totalCount = await PaymentCampaign.countDocuments(query)
 
-    const payment = await PaymentCampaign.find({ id_charity: req.params.id })
-      .sort({ createdAt: 1 })
-      .skip((page - 1) * rows)
-      .limit(rows)
-      // .populate('id_user')
-      .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
-      .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+    if (!getAll) {
+      const page = parseInt(req.query.page as string) || 1
+      const rows = parseInt(req.query.rows as string) || 10
 
-      .select('-__v')
-      .exec()
+      const totalPages = Math.ceil(totalCount / rows)
+      // const currentDate = new Date()
 
-    return res.status(200).json({
-      campaignPayment: payment,
-      meta: {
-        page,
-        rows,
-        totalPages,
-        total: totalCount,
-      },
-    })
+      const payment = await PaymentCampaign.find(query)
+        .sort({ createdAt: 1 })
+        .skip((page - 1) * rows)
+        .limit(rows)
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          page,
+          rows,
+          totalPages,
+          total: totalCount,
+        },
+      })
+    } else {
+      const payment = await PaymentCampaign.find(query)
+        .sort({ createdAt: 1 })
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          total: totalCount,
+        },
+      })
+    }
   } catch (error) {
     return errorHandler(error, res)
   }
@@ -126,45 +182,69 @@ export const gePaymentByIdCharity = async (
 // desc create Payment by id user
 // @route GET /api/v1/payment/charity/list
 // @access Private
-export const gePaymentByIdUser = async (
+export const getPaymentByIdUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const page = parseInt(req.query.page as string) || 1
-    const rows = parseInt(req.query.rows as string) || 10
+    const { getAll } = req.query
+    const query: any = {
+      id_user: req.params.id,
+    }
+    if (req.query.status) {
+      query.status = req.query.status
+    }
+    const totalCount = await PaymentCampaign.countDocuments(query)
 
-    const totalCount = await Charity.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
-    // const currentDate = new Date()
+    if (!getAll) {
+      const page = parseInt(req.query.page as string) || 1
+      const rows = parseInt(req.query.rows as string) || 10
 
-    const payment = await PaymentCampaign.find({ id_user: req.params.id })
-      .sort({ createdAt: 1 })
-      .skip((page - 1) * rows)
-      .limit(rows)
-      // .populate('id_user')
-      .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
-      .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+      const totalPages = Math.ceil(totalCount / rows)
+      // const currentDate = new Date()
 
-      .select('-__v')
-      .exec()
+      const payment = await PaymentCampaign.find(query)
+        .sort({ createdAt: 1 })
+        .skip((page - 1) * rows)
+        .limit(rows)
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
 
-    return res.status(200).json({
-      campaignPayment: payment,
-      meta: {
-        page,
-        rows,
-        totalPages,
-        total: totalCount,
-      },
-    })
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          page,
+          rows,
+          totalPages,
+          total: totalCount,
+        },
+      })
+    } else {
+      const payment = await PaymentCampaign.find(query)
+        .sort({ createdAt: 1 })
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          total: totalCount,
+        },
+      })
+    }
   } catch (error) {
     return errorHandler(error, res)
   }
 }
-
-
 
 // desc create charity payment
 // @route POST /api/v1/payment/charity/create transactions
@@ -223,8 +303,48 @@ export const createTransaction = async (req: Request, res: Response) => {
       quantity,
       amount,
       status: 'process',
+
+      /* Create payment campaign */
     }
     const paymentCampaign = await PaymentCampaign.create(dataPayment)
+
+    /* Create Midtrans Payment */
+    const clientHost =
+      process.env.NODE_ENV?.trim() === 'development'
+        ? process.env.CORS_LOCAL
+        : process.env.CORS_OPEN
+
+    const resMidtrans = await api.post(
+      `${SERVICE.PaymentGeneral}/process-transaction`,
+      {
+        transaction: {
+          id: paymentCampaign._id,
+          amount: paymentCampaign.amount,
+        },
+        user: {
+          first_name: user.name.split(' ')[0],
+          last_name: user.name.split(' ')[1],
+          email: user.email,
+        },
+        items: [
+          {
+            id: charity._id,
+            price: paymentCampaign.amount,
+            quantity: 1,
+            name: charity.title,
+            url: `${clientHost}/campaign/${charity.slug}`,
+          },
+        ],
+      }
+    )
+    const dataMidtransResponse = await resMidtrans.data.data
+    await api.patch(
+      `${SERVICE.PaymentCharity}/add-midtrans-response/${paymentCampaign._id}`,
+      {
+        response_midtrans: dataMidtransResponse,
+        id_user,
+      }
+    )
 
     /* Get populated data */
     const getPayment = await api.get(
@@ -240,8 +360,9 @@ export const createTransaction = async (req: Request, res: Response) => {
       message: 'Payment campaign created successfully',
       content: { ...payment },
     })
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
+    // console.log(error)
+    // console.log(error.message)
     await session.abortTransaction()
     session.endSession()
     return errorHandler(error, res)
@@ -351,7 +472,7 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
     const { id } = req.params // ID of the charity to update
     const { id_user, response_midtrans } = req.body
 
-    const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
+    // const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
 
     // Find the charity by ID and check if the author matches the user ID
     const existingPaymentCampaign = await PaymentCampaign.findById(id)
@@ -362,7 +483,7 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
     }
 
     // Check if the user making the request is the author of the banner
-    if (existingPaymentCampaign?.id_user?.toString() !== userId) {
+    if (existingPaymentCampaign?.id_user?.toString() !== id_user) {
       return res.status(403).json({
         error: {
           code: 403,
@@ -372,9 +493,10 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
     }
 
     const dataPayment: IPaymentCampaign = {
-      id_user,
+      // id_user,
       response_midtrans,
     }
+    console.log(response_midtrans)
 
     const updatedPaymentCampaign = await PaymentCampaign.updateOne(
       { _id: id },
@@ -396,6 +518,7 @@ export const updateMidtransResponse = async (req: Request, res: Response) => {
       content: updatedCampaign,
     })
   } catch (error) {
+    console.log(error)
     await session.abortTransaction()
     session.endSession()
     return errorHandler(error, res)

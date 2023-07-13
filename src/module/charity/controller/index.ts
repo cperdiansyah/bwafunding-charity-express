@@ -96,7 +96,7 @@ export const getCharityBySlug = async (
   next: NextFunction
 ) => {
   try {
-    const charity = await Charity.find({
+    const charity = await Charity.findOne({
       slug: req.params.id
     })
       .populate({
