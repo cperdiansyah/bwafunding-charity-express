@@ -2,7 +2,7 @@ import express from 'express'
 import {
   createTransaction,
   gePaymentByIdCharity,
-  gePaymentByIdUser,
+  getPaymentByIdUser,
   getAllCharityPayment,
   getPaymentById,
   updateMidtransResponse,
@@ -14,7 +14,7 @@ const router = express.Router()
 /* Get */
 router.route('/list').get(getAllCharityPayment)
 router.route('/:id').get(getPaymentById)
-router.route('/user/:id').get(gePaymentByIdUser)
+router.route('/user/:id').get(getPaymentByIdUser)
 router.route('/charity/:id').get(gePaymentByIdCharity)
 /* Post */
 router.route('/create-transaction').post(createTransaction)

@@ -24,33 +24,53 @@ export const getAllCharityPayment = async (
   next: NextFunction
 ) => {
   try {
-    const page = parseInt(req.query.page as string) || 1
-    const rows = parseInt(req.query.rows as string) || 10
-
+    const { getAll } = req.query
     const totalCount = await Charity.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
-    // const currentDate = new Date()
 
-    const payment = await PaymentCampaign.find({})
-      .sort({ createdAt: 1 })
-      .skip((page - 1) * rows)
-      .limit(rows)
-      // .populate('id_user')
-      .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
-      .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+    if (!getAll) {
+      const page = parseInt(req.query.page as string) || 1
+      const rows = parseInt(req.query.rows as string) || 10
 
-      .select('-__v')
-      .exec()
+      const totalPages = Math.ceil(totalCount / rows)
 
-    return res.status(200).json({
-      campaignPayment: payment,
-      meta: {
-        page,
-        rows,
-        totalPages,
-        total: totalCount,
-      },
-    })
+      const payment = await PaymentCampaign.find({})
+        .sort({ createdAt: 1 })
+        .skip((page - 1) * rows)
+        .limit(rows)
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          page,
+          rows,
+          totalPages,
+          total: totalCount,
+        },
+      })
+    } else {
+      const payment = await PaymentCampaign.find({})
+        .sort({ createdAt: 1 })
+
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          total: totalCount,
+        },
+      })
+    }
   } catch (error) {
     return errorHandler(error, res)
   }
@@ -95,33 +115,53 @@ export const gePaymentByIdCharity = async (
   next: NextFunction
 ) => {
   try {
-    const page = parseInt(req.query.page as string) || 1
-    const rows = parseInt(req.query.rows as string) || 10
-
+    const { getAll } = req.query
     const totalCount = await Charity.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
-    // const currentDate = new Date()
 
-    const payment = await PaymentCampaign.find({ id_charity: req.params.id })
-      .sort({ createdAt: 1 })
-      .skip((page - 1) * rows)
-      .limit(rows)
-      // .populate('id_user')
-      .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
-      .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+    if (!getAll) {
+      const page = parseInt(req.query.page as string) || 1
+      const rows = parseInt(req.query.rows as string) || 10
 
-      .select('-__v')
-      .exec()
+      const totalPages = Math.ceil(totalCount / rows)
+      // const currentDate = new Date()
 
-    return res.status(200).json({
-      campaignPayment: payment,
-      meta: {
-        page,
-        rows,
-        totalPages,
-        total: totalCount,
-      },
-    })
+      const payment = await PaymentCampaign.find({ id_charity: req.params.id })
+        .sort({ createdAt: 1 })
+        .skip((page - 1) * rows)
+        .limit(rows)
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          page,
+          rows,
+          totalPages,
+          total: totalCount,
+        },
+      })
+    } else {
+      const payment = await PaymentCampaign.find({ id_charity: req.params.id })
+        .sort({ createdAt: 1 })
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          total: totalCount,
+        },
+      })
+    }
   } catch (error) {
     return errorHandler(error, res)
   }
@@ -129,39 +169,58 @@ export const gePaymentByIdCharity = async (
 // desc create Payment by id user
 // @route GET /api/v1/payment/charity/list
 // @access Private
-export const gePaymentByIdUser = async (
+export const getPaymentByIdUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const page = parseInt(req.query.page as string) || 1
-    const rows = parseInt(req.query.rows as string) || 10
-
+    const { getAll } = req.query
     const totalCount = await Charity.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
-    // const currentDate = new Date()
+    if (!getAll) {
+      const page = parseInt(req.query.page as string) || 1
+      const rows = parseInt(req.query.rows as string) || 10
 
-    const payment = await PaymentCampaign.find({ id_user: req.params.id })
-      .sort({ createdAt: 1 })
-      .skip((page - 1) * rows)
-      .limit(rows)
-      // .populate('id_user')
-      .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
-      .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+      const totalPages = Math.ceil(totalCount / rows)
+      // const currentDate = new Date()
 
-      .select('-__v')
-      .exec()
+      const payment = await PaymentCampaign.find({ id_user: req.params.id })
+        .sort({ createdAt: 1 })
+        .skip((page - 1) * rows)
+        .limit(rows)
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
 
-    return res.status(200).json({
-      campaignPayment: payment,
-      meta: {
-        page,
-        rows,
-        totalPages,
-        total: totalCount,
-      },
-    })
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          page,
+          rows,
+          totalPages,
+          total: totalCount,
+        },
+      })
+    } else {
+      const payment = await PaymentCampaign.find({ id_user: req.params.id })
+        .sort({ createdAt: 1 })
+        // .populate('id_user')
+        .populate('id_charity', 'title slug') // Populate the 'id_charity' field with 'name' attribute from the Charity model
+        .populate('id_user', 'name email') // Populate the 'id_user' field with 'name' and 'email' attributes from the User model
+
+        .select('-__v')
+        .exec()
+
+      return res.status(200).json({
+        campaignPayment: payment,
+        meta: {
+          total: totalCount,
+        },
+      })
+    }
   } catch (error) {
     return errorHandler(error, res)
   }
