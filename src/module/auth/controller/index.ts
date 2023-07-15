@@ -81,6 +81,7 @@ export const login = async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        id: user._id,
         accessToken,
       })
       .end()
@@ -188,6 +189,7 @@ export const register = async (req: Request, res: Response) => {
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
+      id: newUser._id,
       accessToken,
     })
   } catch (err) {
