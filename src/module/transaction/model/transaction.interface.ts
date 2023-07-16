@@ -1,10 +1,19 @@
 import { Types } from 'mongoose'
 
+export type statusTransaction =
+  | 'pending'
+  | 'settlement'
+  | 'deny'
+  | 'cancel'
+  | 'failure'
+  | 'expire'
+  | 'refund'
+
 export interface ITransaction {
   user_id?: Types.ObjectId
   transaction_type?: 'campaign' | 'sedekah-subuh'
   campaign_id?: Types.ObjectId
-  status?: 'pending' | 'paid' | 'failure' | 'cancel' | 'expire' | 'refund'
+  status?: statusTransaction
   quantity?: number
   amount?: number
   response_midtrans?: IResponseMidtrans | any

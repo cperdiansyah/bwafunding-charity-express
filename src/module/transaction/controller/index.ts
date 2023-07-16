@@ -384,18 +384,60 @@ export const chargeTransaction = async (req: Request, res: Response) => {
 // @access Private
 
 export const notificationPush = async (req: Request, res: Response) => {
-  console.log(req?.body)
-  return res.status(200).json({
-    message: 'Transaction status updated successfully',
-    data: req?.body,
-  })
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
+    const midtransSignature = req.body.signature_key as string
+    const isValidSignature = verifyMidtransSignature(
+      req.body,
+      midtransSignature
+    )
+    if (!isValidSignature) {
+      return res.status(403).json({ message: 'Invalid signature' })
+    }
+
+    // Extract the necessary information from the notification
+    const { transaction_status, order_id } = req.body
+
+    // Update the transaction status in the database
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      { _id: order_id },
+      { $set: { status: transaction_status } },
+      { new: true }
+    )
+
+    console.log(updatedTransaction)
+
+    await session.commitTransaction()
+    session.endSession()
+
+    return res.status(200).json({
+      message: 'Transaction status updated successfully',
+      data: req?.body,
+    })
   } catch (error) {
     console.log(error)
     await session.abortTransaction()
     session.endSession()
     return errorHandler(error, res)
   }
+}
+
+/* Helper Verify Midtrans Signature */
+// Helper function to verify Midtrans signature
+function verifyMidtransSignature(body: any, signature: string): boolean {
+  // Replace with your actual Midtrans credentials
+  const serverKey = MIDTRANS_SERVER_KEY
+
+  // Concatenate timestamp and server key with the request body
+  const concatenatedString = `${body.order_id}${body.status_code}${body.gross_amount}${serverKey}`
+
+  // Generate the signature using SHA512 and server key
+  const generatedSignature = crypto
+    .createHash('sha512')
+    .update(concatenatedString)
+    .digest('hex')
+
+  // Compare the generated signature with the received signature
+  return generatedSignature === signature
 }
