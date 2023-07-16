@@ -101,7 +101,7 @@ app.use('/api/v1/media', mediaRoutes)
 /* Payment Router */
 app.use('/api/v1/payment/general', generalPaymentRoutes)
 app.use('/api/v1/payment/charity', campaignPaymentRoutes)
-app.use('/api/v1/transcation', transactionRoutes)
+app.use('/api/v1/transaction', transactionRoutes)
 
 // Seeder route
 if (NODE_ENV?.trim() === 'development') {

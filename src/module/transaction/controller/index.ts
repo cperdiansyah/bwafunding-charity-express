@@ -15,12 +15,16 @@ import Transaction from '../model/index.js'
 import mongoose from 'mongoose'
 import User from '../../user/model/index.js'
 import Charity from '../../charity/model/index.js'
-import { api } from '../../../utils/api.js'
 import { ITransaction } from '../model/transaction.interface.js'
-import { processTransaction } from '../../payment/general/controller/index.js'
+
+const snap = new MidtransClient.Snap({
+  isProduction: false,
+  serverKey: MIDTRANS_SERVER_KEY,
+  clientKey: MIDTRANS_CLIENT_KEY,
+})
 
 // desc create charity payment
-// @route GET /api/v1/payment/charity/list
+// @route GET /api/v1/transcation/list
 // @access Private
 export const getAllCharityPayment = async (
   req: Request,
@@ -28,13 +32,13 @@ export const getAllCharityPayment = async (
   next: NextFunction
 ) => {
   try {
-    const { getAll, id_charities } = req.query
+    const { getAll, campaign_ids } = req.query
     const query: any = {}
     if (req.query.status) {
       query.status = req.query.status
     }
-    if (id_charities) {
-      query.campaign_id = { $in: id_charities }
+    if (campaign_ids) {
+      query.campaign_id = { $in: campaign_ids }
     }
     const totalCount = await Transaction.countDocuments(query)
 
@@ -89,7 +93,7 @@ export const getAllCharityPayment = async (
   }
 }
 // desc get charity payment detail
-// @route GET /api/v1/payment/charity/:id
+// @route GET /api/v1/transcation/:id
 // @access Private
 export const getPaymentById = async (
   req: Request,
@@ -120,7 +124,7 @@ export const getPaymentById = async (
 }
 
 // desc get Payment by id charity
-// @route GET /api/v1/payment/charity/list
+// @route GET /api/v1/transcation/list
 // @access Private
 export const gePaymentByIdCharity = async (
   req: Request,
@@ -186,8 +190,8 @@ export const gePaymentByIdCharity = async (
     return errorHandler(error, res)
   }
 }
-// desc create Payment by id user
-// @route GET /api/v1/payment/charity/list
+// desc get Payment by id user
+// @route GET /api/v1/transcation/list
 // @access Private
 export const getPaymentByIdUser = async (
   req: Request,
@@ -252,16 +256,14 @@ export const getPaymentByIdUser = async (
     return errorHandler(error, res)
   }
 }
+// desc create transaction
+// @route GET /api/v1/transcation/list
+// @access Private
 
 export const chargeTransaction = async (req: Request, res: Response) => {
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    const snap = new MidtransClient.Snap({
-      isProduction: false,
-      serverKey: MIDTRANS_SERVER_KEY,
-      clientKey: MIDTRANS_CLIENT_KEY,
-    })
     const {
       user_id,
       campaign_id,
@@ -360,9 +362,6 @@ export const chargeTransaction = async (req: Request, res: Response) => {
       { response_midtrans: midtransCharge },
       { new: true }
     )
-    // const transaction = await Transaction.findById(DataTransaction.id)
-
-    console.log(updatedTransaction)
 
     await session.commitTransaction()
     session.endSession()
@@ -372,6 +371,27 @@ export const chargeTransaction = async (req: Request, res: Response) => {
       message: 'Payment campaign created successfully',
       content: updatedTransaction,
     })
+  } catch (error) {
+    console.log(error)
+    await session.abortTransaction()
+    session.endSession()
+    return errorHandler(error, res)
+  }
+}
+
+// desc callback notification push
+// @route GET /api/v1/transcation/notifications-push
+// @access Private
+
+export const notificationPush = async (req: Request, res: Response) => {
+  console.log(req?.body)
+  return res.status(200).json({
+    message: 'Transaction status updated successfully',
+    data: req?.body,
+  })
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
   } catch (error) {
     console.log(error)
     await session.abortTransaction()
