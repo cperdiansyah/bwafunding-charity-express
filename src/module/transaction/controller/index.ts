@@ -287,6 +287,7 @@ export const chargeTransaction = async (req: Request, res: Response) => {
       _id: campaign_id,
     })
 
+    /* Check charity exist */
     if (!charity) {
       return res.status(404).json({
         error: {
@@ -295,6 +296,27 @@ export const chargeTransaction = async (req: Request, res: Response) => {
         },
       })
     }
+
+    /* Check total amount charity <= donation target */
+    const transaction = await Transaction.find({
+      campaign_id: campaign_id,
+      status: 'settlement',
+    })
+      .sort({ createdAt: 1 })
+      .select('-__v')
+      .exec()
+
+    const calculateAmount = calculateTotalAmount(transaction)
+
+    if (calculateAmount > charity?.donation_target) {
+      return res.status(406).json({
+        error: {
+          code: 406,
+          message: 'The donation has exceeded the target',
+        },
+      })
+    }
+
     /* End check */
 
     /* Check amount is noit 0 or is number */
@@ -406,14 +428,12 @@ export const notificationPush = async (req: Request, res: Response) => {
       { new: true }
     )
 
-    console.log(updatedTransaction)
-
     await session.commitTransaction()
     session.endSession()
 
     return res.status(200).json({
       message: 'Transaction status updated successfully',
-      data: req?.body,
+      data: updatedTransaction,
     })
   } catch (error) {
     console.log(error)
@@ -440,4 +460,18 @@ function verifyMidtransSignature(body: any, signature: string): boolean {
 
   // Compare the generated signature with the received signature
   return generatedSignature === signature
+}
+
+/* Helper For get Total Amount */
+function calculateTotalAmount(campaignPayment: any) {
+  let totalAmount = 0
+
+  if (campaignPayment.length === 0) return totalAmount
+
+  for (let i = 0; i < campaignPayment.length; i++) {
+    const payment = campaignPayment[i]
+    totalAmount += payment.amount
+  }
+
+  return totalAmount
 }
