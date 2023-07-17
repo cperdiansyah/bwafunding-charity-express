@@ -199,6 +199,59 @@ export const register = async (req: Request, res: Response) => {
   }
 }
 
+export const checkAccount = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body
+    let user = await User.findOne({
+      $or: [{ email }, { username: email }],
+    })
+    if (!user) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'User not found',
+        },
+      })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Username/Email valid',
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { email, newPassword } = req.body
+
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'User not found',
+        },
+      })
+    }
+
+    // Update the user's password
+    const hashPassword = await hashSync(newPassword, genSaltSync(10))
+    user.password = hashPassword
+    await user.save()
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Password reset successful',
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
 export const anonymousToken = async (req: Request, res: Response) => {
   const tokenData: IAnonymousToken = {
     role: 'user',
