@@ -9,6 +9,7 @@ dotenv.config()
 import {
   MIDTRANS_CLIENT_KEY,
   MIDTRANS_SERVER_KEY,
+  MIDTRANS_BASE_URL,
 } from '../../../utils/index.js'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import Transaction from '../model/index.js'
@@ -16,6 +17,7 @@ import mongoose from 'mongoose'
 import User from '../../user/model/index.js'
 import Charity from '../../charity/model/index.js'
 import { ITransaction } from '../model/transaction.interface.js'
+import axios from 'axios'
 
 const snap = new MidtransClient.Snap({
   isProduction: false,
@@ -433,6 +435,71 @@ export const notificationPush = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: 'Transaction status updated successfully',
+      data: updatedTransaction,
+    })
+  } catch (error) {
+    console.log(error)
+    await session.abortTransaction()
+    session.endSession()
+    return errorHandler(error, res)
+  }
+}
+
+// desc callback notification push
+// @route GET /api/v1/transcation/notifications-push
+// @access Private
+
+export const checkStatus = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const transaction = req.params.id
+    const { forceUdated } = req.query
+    const buffer = Buffer.from(`${MIDTRANS_SERVER_KEY}:`)
+    const AUTH = buffer.toString('base64')
+    const config = {
+      headers: {
+        Accept: ' application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${AUTH}`,
+      },
+      withCredentials: true,
+    }
+    const resStatus = await axios.get(
+      `${MIDTRANS_BASE_URL}/${transaction}/status`,
+      config
+    )
+    const dataStatus = resStatus.data
+
+    const midtransSignature = dataStatus.signature_key as string
+    const isValidSignature = verifyMidtransSignature(
+      dataStatus,
+      midtransSignature
+    )
+    if (!isValidSignature) {
+      return res.status(403).json({ message: 'Invalid signature' })
+    }
+
+    // // Extract the necessary information from the notification
+    const { transaction_status, order_id } = dataStatus
+
+    // Update the transaction status in the database
+    if (forceUdated) {
+      await Transaction.findOneAndUpdate(
+        { _id: order_id },
+        { $set: { status: transaction_status } },
+        { new: true }
+      )
+    }
+
+    const updatedTransaction = await Transaction.findById(order_id)
+
+    await session.commitTransaction()
+    session.endSession()
+
+    return res.status(200).json({
+      status: true,
+      pesan: 'Berhasil cek status',
       data: updatedTransaction,
     })
   } catch (error) {
