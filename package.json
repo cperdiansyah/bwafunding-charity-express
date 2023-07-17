@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "check-types": "tsc --pretty --noEmit",
     "check-format": "prettier --check .",
-    "check-lint": "eslint . --ext ts --ext tsx --ext js"
+    "check-lint": "eslint . --ext ts --ext tsx --ext js",
+    "ngrok": "ngrok http 5000 "
   },
   "author": "cperdiansyah",
   "license": "ISC",
@@ -51,6 +52,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
+    "ngrok": "^5.0.0-beta.2",
     "nodemon": "^2.0.22",
     "prettier": "2.8.8",
     "ts-node": "^10.9.1",
