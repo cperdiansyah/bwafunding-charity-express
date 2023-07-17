@@ -237,12 +237,12 @@ export const resetPassword = async (req: Request, res: Response) => {
         },
       })
     }
-
-    // Update the user's password
     const hashPassword = await hashSync(newPassword, genSaltSync(10))
-    user.password = hashPassword
-    await user.save()
-
+    await User.findByIdAndUpdate(
+      user._id,
+      { password: hashPassword },
+      { new: true }
+    )
     return res.status(200).json({
       status: 'success',
       message: 'Password reset successful',
