@@ -18,9 +18,13 @@ export const getAllBanner = async (
 
     const totalCount = await Banner.countDocuments({})
     const totalPages = Math.ceil(totalCount / rows)
+    const currentDate = new Date()
 
-    const banners: IBanner[] = await Banner.find({})
-      .sort({ createdAt: -1 })
+
+    const banners: IBanner[] = await Banner.find({
+      end_date: { $gte: currentDate },
+    })
+      .sort({ end_date: -1 })
       .skip((page - 1) * rows)
       .limit(rows)
       .populate({

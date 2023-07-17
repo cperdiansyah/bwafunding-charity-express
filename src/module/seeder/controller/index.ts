@@ -12,6 +12,7 @@ import Charity from '../../charity/model/index.js'
 import banners from '../../../data/banner.js'
 import { IBanner } from '../../banner/model/banner.interface.js'
 import Banner from '../../banner/model/index.js'
+import PaymentCampaign from '../../payment/charity/model/index.js'
 
 export const importData = async (req: Request, res: Response) => {
   try {
@@ -56,6 +57,9 @@ export const importData = async (req: Request, res: Response) => {
 export const destroyData = async (req: Request, res: Response) => {
   try {
     await User.deleteMany({})
+    await Charity.deleteMany({})
+    await Banner.deleteMany({})
+    await PaymentCampaign.deleteMany({})
     res.status(200).json({
       status: 'success',
       message: 'Data Destroyed',

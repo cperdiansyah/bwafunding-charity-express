@@ -29,9 +29,12 @@ export const getAllCharity = async (
 
     const totalCount = await Charity.countDocuments({})
     const totalPages = Math.ceil(totalCount / rows)
+    const currentDate = new Date()
 
-    const charities: ICharity[] = await Charity.find({})
-      .sort({ createdAt: -1 })
+    const charities: ICharity[] = await Charity.find({
+      end_date: { $gte: currentDate },
+    })
+      .sort({ end_date: 1 })
       .skip((page - 1) * rows)
       .limit(rows)
       .populate({
@@ -64,6 +67,38 @@ export const getCharityById = async (
 ) => {
   try {
     const charity: ICharity | null = await Charity.findById(req.params.id)
+      .populate({
+        path: 'author',
+        select: 'name',
+      })
+      .select('-__v')
+    if (charity === null) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Charity not found',
+        },
+      })
+    }
+    return res.status(200).json({
+      charity: charity,
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+// desc Get a single charities
+// @route GET /api/v1/charity/slug/:id
+// @access Public
+export const getCharityBySlug = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const charity = await Charity.findOne({
+      slug: req.params.id
+    })
       .populate({
         path: 'author',
         select: 'name',
