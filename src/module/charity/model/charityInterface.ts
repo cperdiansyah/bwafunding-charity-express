@@ -13,6 +13,7 @@ export interface ICharity {
   post_date: Date | null
   author?: Types.ObjectId | null
   media?: ICharityMedia[] | null
+  campaign_type: 'campaign' | 'sedekah-subuh'
 }
 
 export interface ICharityMedia {
