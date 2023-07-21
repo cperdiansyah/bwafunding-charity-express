@@ -5,6 +5,7 @@ const approvalSchema: Schema<IApproval> = new mongoose.Schema(
     status: {
       type: String,
       required: [true, 'title is required'],
+      default:'pending'
     },
     approval_type: {
       type: String,

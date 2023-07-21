@@ -1,6 +1,7 @@
 import express from 'express'
-import { verifyAnonymousToken } from '../../../middleware/verifyToken.js'
-import { getAllApproval, getApprovalByForeignId, getApprovalById } from '../controller/index.js'
+import { verifyAnonymousToken, verifyToken } from '../../../middleware/verifyToken.js'
+import { crateApproval, getAllApproval, getApprovalByForeignId, getApprovalById, updateApproval } from '../controller/index.js'
+import { adminAndUserVerifiedAccess } from '../../../middleware/authMiddleware.js'
 const router = express.Router()
 
 // Get Router
@@ -9,7 +10,12 @@ router.route('/:id').get([verifyAnonymousToken], getApprovalById)
 router.route('/foreign/:id').get([verifyAnonymousToken], getApprovalByForeignId)
 
 // Post Router
+router.route('/create').post([verifyToken, adminAndUserVerifiedAccess], crateApproval)
 
+// Patch Router
+router
+  .route('/update/:id')
+  .patch([verifyToken, adminAndUserVerifiedAccess], updateApproval)
 
 
 export default router
