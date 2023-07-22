@@ -1,4 +1,6 @@
+import dayjs from 'dayjs'
 import { IBanner } from '../module/banner/model/banner.interface.js'
+import { getRandomDate } from './charity.js'
 
 const banners: IBanner[] = [
   {
@@ -236,5 +238,19 @@ const banners: IBanner[] = [
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
 ]
+// Update the charities array
+banners.forEach((banner) => {
+  // Update start_date to current date
+  banner.start_date = dayjs().toDate()
+
+  // Update end_date to a random date after start_date, at least 3 weeks away
+  banner.end_date = getRandomDate(
+    banner.start_date,
+    dayjs(banner.start_date).add(3, 'week').toDate()
+  )
+
+  // Update post_date to a random date between start_date and end_date
+  // charity.post_date = getRandomDate(charity.start_date, charity.end_date)
+})
 
 export default banners
