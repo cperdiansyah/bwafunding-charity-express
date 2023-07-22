@@ -12,9 +12,9 @@ import Charity from '../../charity/model/index.js'
 import banners from '../../../data/banner.js'
 import { IBanner } from '../../banner/model/banner.interface.js'
 import Banner from '../../banner/model/index.js'
-import PaymentCampaign from '../../payment/charity/model/index.js'
 import Approval from '../../approval/model/index.js'
 import CharityFundHistory from '../../charity/model/fund_history.js'
+import Transaction from '../../transaction/model/index.js'
 
 export const importData = async (req: Request, res: Response) => {
   try {
@@ -79,5 +79,5 @@ const destroy = async () => {
   await Banner.deleteMany({})
   await Approval.deleteMany({})
   await CharityFundHistory.deleteMany({})
-  await PaymentCampaign.deleteMany({})
+  await Transaction.deleteMany({})
 }
