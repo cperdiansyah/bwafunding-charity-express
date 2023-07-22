@@ -9,6 +9,7 @@ import {
   getApprovalByForeignId,
   getApprovalById,
   updateApproval,
+  updateApprovalByForeignId,
 } from '../controller/index.js'
 import { adminAndUserVerifiedAccess } from '../../../middleware/authMiddleware.js'
 const router = express.Router()
@@ -27,5 +28,8 @@ router
 router
   .route('/update/:id')
   .patch([verifyToken, adminAndUserVerifiedAccess], updateApproval)
+router
+  .route('/update-by-foreign-id/:id')
+  .patch([verifyToken, adminAndUserVerifiedAccess], updateApprovalByForeignId)
 
 export default router

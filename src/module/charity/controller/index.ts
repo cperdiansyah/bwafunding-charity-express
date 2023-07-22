@@ -272,7 +272,7 @@ export const updateCharity = async (
 // desc update charity
 // @route patch /api/v1/charity/:id/status
 // @access Private
-export const acceptCharity = async (
+export const updateStatusCharity = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -282,6 +282,7 @@ export const acceptCharity = async (
   try {
     const { id } = req.params // ID of the charity to update
     const { status } = req.body // Updated data
+    const { accessToken } = req.body.user //user data
 
     // Find the charity by ID and check if the author matches the user ID
     const existingCharity = await Charity.findById(id)
@@ -301,6 +302,22 @@ export const acceptCharity = async (
         post_date: Date.now(),
       }
     }
+
+    const dataApproval: IApproval = {
+      approval_type: 'charity',
+      foreign_id: existingCharity._id,
+      status,
+    }
+
+    await api.patch(
+      `${SERVICE.Approval}/update-by-foreign-id/${existingCharity._id}`,
+      dataApproval,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+        },
+      }
+    )
 
     await Charity.updateOne({ _id: id }, { $set: dataCharity })
     await session.commitTransaction()

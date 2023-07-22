@@ -1,6 +1,6 @@
 import express from 'express'
 import {
-  acceptCharity,
+  updateStatusCharity,
   crateCharity,
   deleteCharity,
   getAllCharity,
@@ -34,7 +34,9 @@ router
   .route('/:id')
   .patch([verifyToken, adminAndUserVerifiedAccess], updateCharity)
 // accept charity
-router.route('/:id/status').patch([verifyToken, adminAccess], acceptCharity)
+router
+  .route('/update-status/:id')
+  .patch([verifyToken, adminAccess], updateStatusCharity)
 // upload image
 router.route('/upload').post(uploadCharitymedia)
 

@@ -208,3 +208,54 @@ export const updateApproval = async (
     return errorHandler(error, res)
   }
 }
+
+// desc update approval request
+// @route POST /api/v1/approval/update-by-foreign-id/:id
+// @access Private
+export const updateApprovalByForeignId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const { id } = req.params // ID of the approval to update
+    const { approval_type, foreign_id, status } = req.body // Updated data
+
+    // Find the approval by ID
+    const existingApproval = await Approval.findOne({
+      foreign_id: id,
+    })
+    if (!existingApproval) {
+      return res
+        .status(404)
+        .json({ error: { code: 404, message: 'Approval not found' } })
+    }
+
+    const dataApproval: IApproval = {
+      approval_type,
+      foreign_id,
+      status,
+    }
+
+    const updatedApproval = await Approval.updateOne(
+      { _id: existingApproval._id },
+      { $set: dataApproval }
+    )
+    if (updatedApproval.modifiedCount === 0) {
+      return res.status(200).json({ message: 'No changes made to the charity' })
+    }
+
+    await session.commitTransaction()
+    session.endSession()
+    return res.status(200).json({
+      status: 'success',
+      message: 'Approval updated successfully',
+    })
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    return errorHandler(error, res)
+  }
+}
