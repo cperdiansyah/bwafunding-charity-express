@@ -13,6 +13,8 @@ import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { IAnonymousToken, ITokenPayload } from '../../../types/index.js'
 import mongoose from 'mongoose'
 import { cookiesOptions } from '../../../utils/helpers/index.js'
+import { IApproval } from '../../approval/model/approval.interface.js'
+import { SERVICE, api } from '../../../utils/api.js'
 
 export const login = async (req: Request, res: Response) => {
   const session = await mongoose.startSession()
@@ -166,11 +168,14 @@ export const register = async (req: Request, res: Response) => {
       password: hashPassword,
     })
 
+    /* Generate JWT */
+
     const userData = {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
       is_verified: newUser.is_verified,
+      isAuthenticated: true,
     }
 
     const accessToken = jwt.sign(userData, JWT_ACCESS_TOKEN_SECRET, {
@@ -180,8 +185,22 @@ export const register = async (req: Request, res: Response) => {
     const refreshToken = jwt.sign(userData, JWT_REFRESH_TOKEN_SECRET, {
       expiresIn: REFRESH_TOKEN_EXPIRED || '7d',
     })
+
     res.clearCookie('refreshAnonToken')
     res.cookie('refreshToken', refreshToken, cookiesOptions)
+
+    /* Create Data Approval */
+    const dataApproval: IApproval = {
+      approval_type: 'user',
+      foreign_id: newUser._id,
+    }
+
+    await api.post(`${SERVICE.Approval}/create`, dataApproval, {
+      headers: {
+        Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+      },
+    })
+
     await session.commitTransaction()
     session.endSession()
 

@@ -22,8 +22,6 @@ import charityRoutes from './module/charity/routes/index.js'
 import charityFundHistoryRoutes from './module/charity/routes/fund_history.js'
 import mediaRoutes from './module/media/routes/index.js'
 import bannerRoutes from './module/banner/routes/index.js'
-import generalPaymentRoutes from './module/payment/general/routes/index.js'
-import campaignPaymentRoutes from './module/payment/charity/routes/index.js'
 import transactionRoutes from './module/transaction/routes/index.js'
 import approvalRoutes from './module/approval/routes/index.js'
 
@@ -102,13 +100,10 @@ app.use('/api/v1/banner', bannerRoutes)
 app.use('/api/v1/media', mediaRoutes)
 
 /* Payment Router */
-app.use('/api/v1/payment/general', generalPaymentRoutes)
-app.use('/api/v1/payment/charity', campaignPaymentRoutes)
 app.use('/api/v1/transaction', transactionRoutes)
 
 /* Approval routes */
 app.use('/api/v1/approval', approvalRoutes)
-
 
 // Seeder route
 if (NODE_ENV?.trim() === 'development') {
