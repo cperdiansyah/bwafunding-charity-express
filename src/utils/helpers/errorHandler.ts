@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 
 export const errorHandler = (err: any, res: Response) => {
+  console.log(err)
   if (err.code === 500) {
     // Handle server error (500)
     return res

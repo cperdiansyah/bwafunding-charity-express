@@ -29,3 +29,10 @@ export interface IAcceptCharityData {
   status: 'accept' | 'pending' | 'rejected'
   post_date?: Date | number | null
 }
+
+export interface ICharityFundHistory {
+  campaign_id?: Types.ObjectId | null
+  transaction_id?: Types.ObjectId | null
+  timestamp?: number
+  funding_status?: 'pending' | 'settled' | 'funded'
+}

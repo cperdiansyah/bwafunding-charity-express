@@ -19,6 +19,7 @@ dotenv.config()
 import seederRoutes from './module/seeder/routes/index.js'
 import authRoutes from './module/auth/routes/index.js'
 import charityRoutes from './module/charity/routes/index.js'
+import charityFundHistoryRoutes from './module/charity/routes/fund_history.js'
 import mediaRoutes from './module/media/routes/index.js'
 import bannerRoutes from './module/banner/routes/index.js'
 import generalPaymentRoutes from './module/payment/general/routes/index.js'
@@ -92,6 +93,7 @@ app.use('/api/v1/auth', authRoutes)
 
 /* Charity router */
 app.use('/api/v1/charity', charityRoutes)
+app.use('/api/v1/charity-fund-history', charityFundHistoryRoutes)
 
 /* Banner router */
 app.use('/api/v1/banner', bannerRoutes)

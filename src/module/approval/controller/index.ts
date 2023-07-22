@@ -120,7 +120,6 @@ export const crateApproval = async (
   session.startTransaction()
   try {
     let { approval_type, foreign_id, status = 'pending' } = req.body
-
     const dataApproval: IApproval = {
       approval_type,
       foreign_id,
@@ -154,6 +153,7 @@ export const crateApproval = async (
       content: approval,
     })
   } catch (error) {
+    // console.log(error)
     await session.abortTransaction()
     session.endSession()
     return errorHandler(error, res)

@@ -5,7 +5,7 @@ const approvalSchema: Schema<IApproval> = new mongoose.Schema(
     status: {
       type: String,
       required: [true, 'title is required'],
-      default:'pending'
+      default: 'pending',
     },
     approval_type: {
       type: String,
@@ -19,6 +19,6 @@ const approvalSchema: Schema<IApproval> = new mongoose.Schema(
   { timestamps: true }
 )
 
-const Approval = mongoose.model<IApproval>('Charity', approvalSchema)
+const Approval = mongoose.model<IApproval>('Approval', approvalSchema)
 
 export default Approval

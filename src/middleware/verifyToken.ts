@@ -28,7 +28,9 @@ export const verifyToken = async (
           },
         })
       }
-      req.body.user = await User.findById(decoded.id).select('-password')
+      const userData: any = await User.findById(decoded.id).select('-password')
+      const user = { ...userData._doc, accessToken: token }
+      req.body.user = user
 
       next()
     } catch (error) {

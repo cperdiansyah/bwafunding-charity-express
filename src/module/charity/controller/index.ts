@@ -14,6 +14,8 @@ import { slugify } from '../../../utils/helpers/index.js'
 import path from 'path'
 import { __dirname } from '../../../utils/index.js'
 import multer from 'multer'
+import { IApproval } from '../../approval/model/approval.interface.js'
+import { SERVICE, api } from '../../../utils/api.js'
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity
@@ -97,7 +99,7 @@ export const getCharityBySlug = async (
 ) => {
   try {
     const charity = await Charity.findOne({
-      slug: req.params.id
+      slug: req.params.id,
     })
       .populate({
         path: 'author',
@@ -143,7 +145,11 @@ export const crateCharity = async (
       media,
     } = req.body
 
-    const { id: userId } = req.body.user
+    const { id: userId, role, accessToken } = req.body.user
+
+    if (role === 'admin') {
+      status = 'accept'
+    }
 
     const dataCharity: ICharity = {
       slug: slugify(title),
@@ -159,13 +165,24 @@ export const crateCharity = async (
       media,
     }
 
-    const newCharity = await Charity.create(dataCharity)
+    const charity = await Charity.create(dataCharity)
+
+    const dataApproval: IApproval = {
+      approval_type: 'charity',
+      foreign_id: charity._id,
+      status,
+    }
+    await api.post(`${SERVICE.Approval}/create`, dataApproval, {
+      headers: {
+        Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+      },
+    })
     await session.commitTransaction()
     session.endSession()
 
     return res.status(200).json({
       status: 'success',
-      content: newCharity,
+      content: charity,
     })
   } catch (error) {
     await session.abortTransaction()
