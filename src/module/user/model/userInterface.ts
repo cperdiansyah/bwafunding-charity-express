@@ -1,4 +1,4 @@
-import { Types } from "mongoose"
+import { Types } from 'mongoose'
 
 // Define interface for User document
 export interface IUser {

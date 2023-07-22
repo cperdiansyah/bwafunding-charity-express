@@ -193,7 +193,9 @@ export const updateApproval = async (
       { $set: dataApproval }
     )
     if (updatedApproval.modifiedCount === 0) {
-      return res.status(200).json({ message: 'No changes made to the approval' })
+      return res
+        .status(200)
+        .json({ message: 'No changes made to the approval' })
     }
 
     await session.commitTransaction()
@@ -244,9 +246,10 @@ export const updateApprovalByForeignId = async (
       { $set: dataApproval }
     )
     if (updatedApproval.modifiedCount === 0) {
-      return res.status(200).json({ message: 'No changes made to the approval' })
+      return res
+        .status(200)
+        .json({ message: 'No changes made to the approval' })
     }
-    
 
     await session.commitTransaction()
     session.endSession()

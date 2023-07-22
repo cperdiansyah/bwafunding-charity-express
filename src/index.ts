@@ -24,6 +24,7 @@ import mediaRoutes from './module/media/routes/index.js'
 import bannerRoutes from './module/banner/routes/index.js'
 import transactionRoutes from './module/transaction/routes/index.js'
 import approvalRoutes from './module/approval/routes/index.js'
+import userRoutes from './module/user/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -88,7 +89,8 @@ app.get('/', (req: Request, res: Response) => {
 
 // Auth routes
 app.use('/api/v1/auth', authRoutes)
-
+/* User Routes */
+app.use('/api/v1/user', userRoutes)
 /* Charity router */
 app.use('/api/v1/charity', charityRoutes)
 app.use('/api/v1/charity-fund-history', charityFundHistoryRoutes)
