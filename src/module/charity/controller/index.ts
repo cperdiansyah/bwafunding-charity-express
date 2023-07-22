@@ -270,7 +270,7 @@ export const updateCharity = async (
 }
 
 // desc update charity
-// @route patch /api/v1/charity/:id/status
+// @route patch /api/v1/charity/update-status/:id
 // @access Private
 export const updateStatusCharity = async (
   req: Request,

@@ -6,7 +6,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -15,7 +15,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -24,7 +24,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -33,7 +33,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -42,7 +42,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -51,7 +51,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -60,7 +60,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -69,7 +69,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -78,7 +78,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -87,7 +87,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -96,7 +96,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -105,7 +105,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -114,7 +114,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -123,7 +123,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -132,7 +132,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -141,7 +141,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -150,7 +150,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -159,7 +159,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -168,7 +168,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -177,7 +177,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -186,7 +186,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -195,7 +195,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -204,7 +204,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -213,7 +213,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -222,7 +222,7 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
@@ -231,11 +231,10 @@ const banners: IBanner[] = [
     start_date: new Date('2023-06-01'),
     end_date: new Date('2023-07-31'),
     redirection_link: 'https://google.com/',
-    status: 'active',
+    status: 'accept',
     image:
       'https://uangonline.com/wp-content/uploads/2023/01/program-charity.jpg',
   },
 ]
-
 
 export default banners
