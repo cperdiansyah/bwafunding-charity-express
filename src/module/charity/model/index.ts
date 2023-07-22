@@ -71,6 +71,11 @@ const charitySchema: Schema<ICharity> = new mongoose.Schema(
       type: [media],
       default: null,
     },
+    campaign_type: {
+      type: String,
+      required: [true, 'campaign_type is required'],
+      default: 'campaign',
+    },
   },
   { timestamps: true }
 )

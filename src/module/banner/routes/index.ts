@@ -6,6 +6,7 @@ import {
   getAllBanner,
   getBannerById,
   updateBanner,
+  updateStatusBanner,
 } from '../controller/index.js'
 import {
   adminAccess,
@@ -26,6 +27,9 @@ router.route('/create').post([verifyToken], crateBanner)
 router
   .route('/:id')
   .patch([verifyToken, adminAndUserVerifiedAccess], updateBanner)
+router
+  .route('/update-status/:id')
+  .patch([verifyToken, adminAndUserVerifiedAccess], updateStatusBanner)
 
 // Delete Router
 router.route('/:id').delete([verifyToken, adminAccess], deleteBanner)

@@ -1,4 +1,13 @@
+import dayjs from 'dayjs';
+
 import { ICharity } from '../module/charity/model/charityInterface.js'
+
+export function getRandomDate(startDate:Date, endDate:Date) {
+  const diffInDays = dayjs(endDate).diff(startDate, 'day')
+  const randomDays = Math.floor(Math.random() * (diffInDays - 21)) + 21
+  return dayjs(startDate).add(randomDays, 'day').toDate()
+}
+
 const charities: ICharity[] = [
   {
     title: 'Charity 1',
@@ -61,5 +70,17 @@ const charities: ICharity[] = [
     author: null,
   },
 ]
+
+// Update the charities array
+charities.forEach((charity) => {
+  // Update start_date to current date
+  charity.start_date = dayjs().toDate();
+
+  // Update end_date to a random date after start_date, at least 3 weeks away
+  charity.end_date = getRandomDate(charity.start_date, dayjs(charity.start_date).add(3, 'week').toDate());
+
+  // Update post_date to a random date between start_date and end_date
+  charity.post_date = getRandomDate(charity.start_date, charity.end_date);
+});
 
 export default charities

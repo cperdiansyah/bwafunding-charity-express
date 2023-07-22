@@ -14,6 +14,8 @@ import { slugify } from '../../../utils/helpers/index.js'
 import path from 'path'
 import { __dirname } from '../../../utils/index.js'
 import multer from 'multer'
+import { IApproval } from '../../approval/model/approval.interface.js'
+import { SERVICE, api } from '../../../utils/api.js'
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity
@@ -97,7 +99,7 @@ export const getCharityBySlug = async (
 ) => {
   try {
     const charity = await Charity.findOne({
-      slug: req.params.id
+      slug: req.params.id,
     })
       .populate({
         path: 'author',
@@ -143,7 +145,11 @@ export const crateCharity = async (
       media,
     } = req.body
 
-    const { id: userId } = req.body.user
+    const { id: userId, role, accessToken } = req.body.user
+
+    if (role === 'admin') {
+      status = 'accept'
+    }
 
     const dataCharity: ICharity = {
       slug: slugify(title),
@@ -159,13 +165,24 @@ export const crateCharity = async (
       media,
     }
 
-    const newCharity = await Charity.create(dataCharity)
+    const charity = await Charity.create(dataCharity)
+
+    const dataApproval: IApproval = {
+      approval_type: 'charity',
+      foreign_id: charity._id,
+      status,
+    }
+    await api.post(`${SERVICE.Approval}/create`, dataApproval, {
+      headers: {
+        Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+      },
+    })
     await session.commitTransaction()
     session.endSession()
 
     return res.status(200).json({
       status: 'success',
-      content: newCharity,
+      content: charity,
     })
   } catch (error) {
     await session.abortTransaction()
@@ -253,9 +270,9 @@ export const updateCharity = async (
 }
 
 // desc update charity
-// @route patch /api/v1/charity/:id/status
+// @route patch /api/v1/charity/update-status/:id
 // @access Private
-export const acceptCharity = async (
+export const updateStatusCharity = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -265,6 +282,7 @@ export const acceptCharity = async (
   try {
     const { id } = req.params // ID of the charity to update
     const { status } = req.body // Updated data
+    const { accessToken } = req.body.user //user data
 
     // Find the charity by ID and check if the author matches the user ID
     const existingCharity = await Charity.findById(id)
@@ -284,6 +302,22 @@ export const acceptCharity = async (
         post_date: Date.now(),
       }
     }
+
+    const dataApproval: IApproval = {
+      approval_type: 'charity',
+      foreign_id: existingCharity._id,
+      status,
+    }
+
+    await api.patch(
+      `${SERVICE.Approval}/update-by-foreign-id/${existingCharity._id}`,
+      dataApproval,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+        },
+      }
+    )
 
     await Charity.updateOne({ _id: id }, { $set: dataCharity })
     await session.commitTransaction()

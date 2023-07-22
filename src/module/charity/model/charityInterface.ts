@@ -13,6 +13,7 @@ export interface ICharity {
   post_date: Date | null
   author?: Types.ObjectId | null
   media?: ICharityMedia[] | null
+  campaign_type?: 'campaign' | 'sedekah-subuh'
 }
 
 export interface ICharityMedia {
@@ -27,4 +28,11 @@ export interface RequestWithUserRole extends Request {
 export interface IAcceptCharityData {
   status: 'accept' | 'pending' | 'rejected'
   post_date?: Date | number | null
+}
+
+export interface ICharityFundHistory {
+  campaign_id?: Types.ObjectId | null
+  transaction_id?: Types.ObjectId | null
+  timestamp?: number
+  funding_status?: 'pending' | 'settled' | 'funded'
 }

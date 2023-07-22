@@ -6,6 +6,6 @@ export interface IBanner {
   image: string
   start_date: Date | null
   end_date: Date | null
-  status: 'active' | 'inactive' | 'pending'
+  status: 'accept' | 'reject' | 'pending'
   author?: Types.ObjectId | null
 }
