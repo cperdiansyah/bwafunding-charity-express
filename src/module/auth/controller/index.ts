@@ -84,6 +84,7 @@ export const login = async (req: Request, res: Response) => {
         email: user.email,
         role: user.role,
         id: user._id,
+        is_verified: user.is_verified,
         accessToken,
       })
       .end()
@@ -210,6 +211,7 @@ export const register = async (req: Request, res: Response) => {
       role: newUser.role,
       id: newUser._id,
       accessToken,
+      is_verified: newUser.is_verified,
     })
   } catch (err) {
     await session.abortTransaction()

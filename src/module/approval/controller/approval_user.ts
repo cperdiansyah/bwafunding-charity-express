@@ -21,6 +21,13 @@ export const getAllApprovalUser = async (
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
+    const matchCondition: any = {
+      'approval.approval_type': 'user',
+    }
+
+    if (req.query.is_verified !== undefined) {
+      matchCondition['user.is_verified'] = req.query.is_verified === 'true'
+    }
 
     const approvalUserData = await ApprovalUser.aggregate([
       {
@@ -42,10 +49,7 @@ export const getAllApprovalUser = async (
       { $unwind: '$user' },
       { $unwind: '$approval' },
       {
-        $match: {
-          'user.is_verified': false,
-          'approval.approval_type': 'user',
-        },
+        $match: matchCondition,
       },
       {
         $project: {
