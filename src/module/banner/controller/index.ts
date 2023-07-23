@@ -122,6 +122,7 @@ export const crateBanner = async (
       approval_type: 'banner',
       foreign_id: newCharity._id,
       status,
+      refModel: 'Banner'
     }
 
     await api.post(`${SERVICE.Approval}/create`, dataApproval, {

@@ -194,6 +194,8 @@ export const register = async (req: Request, res: Response) => {
     const dataApproval: IApproval = {
       approval_type: 'user',
       foreign_id: newUser._id,
+      refModel: 'User',
+      status: 'pending',
     }
 
     await api.post(`${SERVICE.Approval}/create`, dataApproval, {

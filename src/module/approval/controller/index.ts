@@ -20,20 +20,69 @@ export const getAllApproval = async (req: Request, res: Response) => {
 
     const totalCount = await Approval.countDocuments({})
     const totalPages = Math.ceil(totalCount / rows)
-    // const currentDate = new Date()
+    const approvals = await Approval.aggregate([
+      {
+        $facet: {
+          users: [
+            { $match: { refModel: 'User' } },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+            {
+              $project: {
+                password: 0,
+                refresh_token: 0,
+                'foreign_data.password': 0,
+                'foreign_data.refresh_token': 0,
+              },
+            },
+          ],
+          charities: [
+            { $match: { refModel: 'Charity' } },
+            {
+              $lookup: {
+                from: 'charities',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+          ],
+          banners: [
+            { $match: { refModel: 'Banner' } },
+            {
+              $lookup: {
+                from: 'banners',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+          ],
+        },
+      },
+      {
+        $project: {
+          approval: { $setUnion: ['$users', '$charities', '$banners'] },
+        },
+      },
+      { $unwind: '$approval' },
+      { $replaceRoot: { newRoot: '$approval' } },
+      { $sort: { createdAt: -1 } },
+      { $skip: (page - 1) * rows },
+      { $limit: rows },
+    ])
 
-    const approval: IApproval[] = await Approval.find({})
-      .sort({ end_date: 1 })
-      .skip((page - 1) * rows)
-      .limit(rows)
-      .populate({
-        path: 'foreign_id',
-        // select: 'name',
-      })
-      .select('-__v')
-      .exec()
     return res.status(200).json({
-      data: approval,
+      data: approvals,
       meta: {
         page,
         rows,
@@ -55,13 +104,66 @@ export const getApprovalById = async (
   next: NextFunction
 ) => {
   try {
-    const approval: IApproval | null = await Approval.findById(req.params.id)
-      .populate({
-        path: 'foreign_id',
-        // select: 'name',
-      })
-      .select('-__v')
-    if (approval === null) {
+    const approval = await Approval.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(req.params.id) } },
+      {
+        $facet: {
+          users: [
+            { $match: { refModel: 'User' } },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+            {
+              $project: {
+                password: 0,
+                refresh_token: 0,
+                'foreign_data.password': 0,
+                'foreign_data.refresh_token': 0,
+              },
+            }, // Exclude sensitive fields
+          ],
+          charities: [
+            { $match: { refModel: 'Charity' } },
+            {
+              $lookup: {
+                from: 'charities',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+          ],
+          banners: [
+            { $match: { refModel: 'Banner' } },
+            {
+              $lookup: {
+                from: 'banners',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+          ],
+        },
+      },
+      {
+        $project: {
+          approval: { $setUnion: ['$users', '$charities', '$banners'] },
+        },
+      },
+      { $unwind: '$approval' },
+      { $replaceRoot: { newRoot: '$approval' } },
+    ])
+
+    if (approval.length === 0) {
       return res.status(404).json({
         error: {
           code: 404,
@@ -70,7 +172,7 @@ export const getApprovalById = async (
       })
     }
     return res.status(200).json({
-      data: approval,
+      data: approval[0],
     })
   } catch (error) {
     return errorHandler(error, res)
@@ -85,14 +187,66 @@ export const getApprovalByForeignId = async (
   next: NextFunction
 ) => {
   try {
-    const approval: IApproval | null = await Approval.findOne({
-      foreign_id: req.params.id,
-    })
-      .populate({
-        path: 'foreign_id',
-      })
-      .select('-__v')
-    if (approval === null) {
+    const approval = await Approval.aggregate([
+      { $match: { foreign_id: new mongoose.Types.ObjectId(req.params.id) } },
+      {
+        $facet: {
+          users: [
+            { $match: { refModel: 'User' } },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+            {
+              $project: {
+                password: 0,
+                refresh_token: 0,
+                'foreign_data.password': 0,
+                'foreign_data.refresh_token': 0,
+              },
+            }, // Exclude sensitive fields
+          ],
+          charities: [
+            { $match: { refModel: 'Charity' } },
+            {
+              $lookup: {
+                from: 'charities',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+          ],
+          banners: [
+            { $match: { refModel: 'Banner' } },
+            {
+              $lookup: {
+                from: 'banners',
+                localField: 'foreign_id',
+                foreignField: '_id',
+                as: 'foreign_data',
+              },
+            },
+            { $unwind: '$foreign_data' },
+          ],
+        },
+      },
+      {
+        $project: {
+          approval: { $setUnion: ['$users', '$charities', '$banners'] },
+        },
+      },
+      { $unwind: '$approval' },
+      { $replaceRoot: { newRoot: '$approval' } },
+    ])
+
+    if (approval.length === 0) {
       return res.status(404).json({
         error: {
           code: 404,
@@ -101,7 +255,7 @@ export const getApprovalByForeignId = async (
       })
     }
     return res.status(200).json({
-      data: approval,
+      data: approval[0],
     })
   } catch (error) {
     return errorHandler(error, res)
@@ -119,11 +273,12 @@ export const crateApproval = async (
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    let { approval_type, foreign_id, status = 'pending' } = req.body
+    let { approval_type, foreign_id, status = 'pending', refModel } = req.body
     const dataApproval: IApproval = {
       approval_type,
       foreign_id,
       status,
+      refModel,
     }
 
     let foreginData
@@ -172,7 +327,7 @@ export const updateApproval = async (
   session.startTransaction()
   try {
     const { id } = req.params // ID of the approval to update
-    const { approval_type, foreign_id, status } = req.body // Updated data
+    const { approval_type, foreign_id, status, refModel } = req.body // Updated data
 
     // Find the approval by ID
     const existingApproval = await Approval.findById(id)
@@ -186,6 +341,7 @@ export const updateApproval = async (
       approval_type,
       foreign_id,
       status,
+      refModel,
     }
 
     const updatedApproval = await Approval.updateOne(

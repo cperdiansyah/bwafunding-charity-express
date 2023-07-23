@@ -29,13 +29,26 @@ export const getAllCharity = async (
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
 
-    const totalCount = await Charity.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
-    const currentDate = new Date()
+    const status = (req.query.status as string) || 'active' // get status from query params
 
-    const charities: ICharity[] = await Charity.find({
-      end_date: { $gte: currentDate },
-    })
+    const filter: any = { end_date: { $gte: new Date() } }
+
+    if (status) {
+      // check if status is one of 'pending', 'active', 'rejected'
+      if (['pending', 'active', 'rejected'].includes(status)) {
+        filter.status = status
+      } else {
+        return res.status(400).json({
+          error:
+            "Invalid status. Status should be one of 'pending', 'active', 'rejected'",
+        })
+      }
+    }
+
+    const totalCount = await Charity.countDocuments(filter)
+    const totalPages = Math.ceil(totalCount / rows)
+
+    const charities: ICharity[] = await Charity.find(filter)
       .sort({ end_date: 1 })
       .skip((page - 1) * rows)
       .limit(rows)
@@ -171,6 +184,7 @@ export const crateCharity = async (
       approval_type: 'charity',
       foreign_id: charity._id,
       status,
+      refModel: 'Charity'
     }
     await api.post(`${SERVICE.Approval}/create`, dataApproval, {
       headers: {

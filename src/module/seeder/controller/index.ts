@@ -15,6 +15,7 @@ import Banner from '../../banner/model/index.js'
 import Approval from '../../approval/model/index.js'
 import CharityFundHistory from '../../charity/model/fund_history.js'
 import Transaction from '../../transaction/model/index.js'
+import ApprovalUser from '../../approval/model/approval_user.js'
 
 export const importData = async (req: Request, res: Response) => {
   try {
@@ -78,6 +79,7 @@ const destroy = async () => {
   await Charity.deleteMany({})
   await Banner.deleteMany({})
   await Approval.deleteMany({})
+  await ApprovalUser.deleteMany({})
   await CharityFundHistory.deleteMany({})
   await Transaction.deleteMany({})
 }
