@@ -17,10 +17,25 @@ export const getAllApproval = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
+    const refModel = req.query.refModel as string
 
-    const totalCount = await Approval.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
+    const filter: any = {}
+    if (refModel) {
+      // check if refModel is one of 'User', 'Charity', 'Banner'
+      if (['User', 'Charity', 'Banner'].includes(refModel)) {
+        filter.refModel = refModel
+      } else {
+        return res.status(400).json({
+          error:
+            "Invalid refModel. refModel should be one of 'User', 'Charity', 'Banner'",
+        })
+      }
+    }
+
+    const totalCount = await Approval.countDocuments(filter)
+
     const approvals = await Approval.aggregate([
+      { $match: filter },
       {
         $facet: {
           users: [
@@ -86,7 +101,7 @@ export const getAllApproval = async (req: Request, res: Response) => {
       meta: {
         page,
         rows,
-        totalPages,
+        totalPages: Math.ceil(totalCount / rows),
         total: totalCount,
       },
     })
