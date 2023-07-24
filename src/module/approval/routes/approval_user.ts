@@ -1,10 +1,20 @@
 import express from 'express'
-import { verifyAnonymousToken, verifyToken } from '../../../middleware/verifyToken.js'
-import { createApprovalUser, getAllApprovalUser, getApprovalByUserId, updateApprovalUser } from '../controller/approval_user.js'
+import {
+  verifyAnonymousToken,
+  verifyToken,
+} from '../../../middleware/verifyToken.js'
+import {
+  createApprovalUser,
+  getAllApprovalUser,
+  getApprovalByUserId,
+  updateApprovalUser,
+  getApprovalUserById,
+} from '../controller/approval_user.js'
 const router = express.Router()
 
 /* Get Routes */
 router.route('/list').get([verifyToken], getAllApprovalUser)
+router.route('/:id').get([verifyToken], getApprovalUserById)
 router.route('/user/:id').get([verifyToken], getApprovalByUserId)
 
 /* Post Routes */

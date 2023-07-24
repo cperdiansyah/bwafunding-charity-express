@@ -80,6 +80,39 @@ export const getAllApprovalUser = async (
   }
 }
 // desc Get a single approval by user id
+// @route GET /api/v1/approval/approval-user/:id
+// @access Private
+export const getApprovalUserById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const populateQuery: PopulateOptions[] = [
+      { path: 'user_id', select: '_id name username role is_verified' },
+      { path: 'approval_id', select: '_id status approval_type foreign_id' },
+    ]
+    const approval: IApprovalUser | null = await ApprovalUser.findById(
+      req.params.id
+    )
+      .populate(populateQuery)
+      .select('-__v')
+    if (approval === null) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Approval not found',
+        },
+      })
+    }
+    return res.status(200).json({
+      data: approval,
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+// desc Get a single approval by user id
 // @route GET /api/v1/approval/approval-user/user/:id
 // @access Private
 export const getApprovalByUserId = async (
