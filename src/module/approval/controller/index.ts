@@ -50,6 +50,15 @@ export const getAllApproval = async (req: Request, res: Response) => {
             },
             { $unwind: '$foreign_data' },
             {
+              $lookup: {
+                from: 'approval_users', // This is assuming the collection name is 'approval_users'
+                localField: '_id', // Assuming the approval_id in 'approval_users' refers to the _id of 'approval'
+                foreignField: 'approval_id',
+                as: 'approval_user_data',
+              },
+            },
+            { $unwind: '$approval_user_data' },
+            {
               $project: {
                 password: 0,
                 refresh_token: 0,

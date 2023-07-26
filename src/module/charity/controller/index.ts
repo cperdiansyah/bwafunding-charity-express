@@ -33,14 +33,9 @@ export const getAllCharity = async (
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
+    // console.log()
 
     const status = (req.query.status as string) || 'accept' // get status from query params
-    const getMe = await api.get(`${SERVICE.User}/me`, {
-      headers: {
-        Authorization: `${req?.headers.authorization}`,
-      },
-    })
-    const dataMe = getMe.data.user
 
     const filter: any = { end_date: { $gte: new Date() } }
 
@@ -58,11 +53,23 @@ export const getAllCharity = async (
         })
       }
     }
-    if (dataMe.role === 'user') {
-      filter.author = dataMe._id
+    if (
+      req?.headers?.authorization &&
+      req?.headers?.authorization?.length > 6
+    ) {
+      const getMe = await api.get(`${SERVICE.User}/me`, {
+        headers: {
+          Authorization: `${req?.headers.authorization}`,
+        },
+      })
+      const dataMe = getMe.data.user
+      if (dataMe.role === 'user' && status === 'all') {
+        filter.author = dataMe._id
+      }
     }
 
     const totalCount = await Charity.countDocuments(filter)
+    // console.log(totalCount)
     const totalPages = Math.ceil(totalCount / rows)
 
     const charities: ICharity[] = await Charity.find(filter)

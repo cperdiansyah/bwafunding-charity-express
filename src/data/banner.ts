@@ -239,7 +239,7 @@ const banners: IBanner[] = [
   },
 ]
 // Update the charities array
-banners.forEach((banner) => {
+banners?.forEach((banner) => {
   // Update start_date to current date
   banner.start_date = dayjs().toDate()
 

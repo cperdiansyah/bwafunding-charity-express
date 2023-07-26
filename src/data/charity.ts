@@ -132,7 +132,7 @@ const charities: ICharity[] = [
 ]
 
 // Update the charities array
-charities.forEach((charity) => {
+charities?.forEach((charity) => {
   // Update start_date to current date
   charity.start_date = dayjs().toDate()
 
