@@ -274,6 +274,7 @@ export const updateStatusBanner = async (
       approval_type: 'banner',
       foreign_id: existingBanner._id,
       status,
+      refModel:'Banner'
     }
 
     await api.patch(
