@@ -17,14 +17,29 @@ export const getAllBanner = async (
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
+    const status = (req.query.status as string) || 'accept' // get status from query params
 
-    const totalCount = await Banner.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
     const currentDate = new Date()
+    const filter: any = { end_date: { $gte: currentDate } }
 
-    const banners: IBanner[] = await Banner.find({
-      end_date: { $gte: currentDate },
-    })
+    if (status) {
+      // check if status is one of 'pending', 'active', 'rejected', 'all'
+      if (['pending', 'accept', 'rejected', 'all'].includes(status)) {
+        // only add status to filter if it is not 'all'
+        if (status !== 'all') {
+          filter.status = status
+        }
+      } else {
+        return res.status(400).json({
+          error:
+            "Invalid status. Status should be one of 'pending', 'active', 'rejected', 'all'",
+        })
+      }
+    }
+    const totalCount = await Banner.countDocuments(filter)
+    const totalPages = Math.ceil(totalCount / rows)
+
+    const banners: IBanner[] = await Banner.find(filter)
       .sort({ end_date: -1 })
       .skip((page - 1) * rows)
       .limit(rows)
@@ -122,7 +137,7 @@ export const crateBanner = async (
       approval_type: 'banner',
       foreign_id: newCharity._id,
       status,
-      refModel: 'Banner'
+      refModel: 'Banner',
     }
 
     await api.post(`${SERVICE.Approval}/create`, dataApproval, {
