@@ -7,6 +7,11 @@ export const SERVICE = {
   Payment: '/api/v1/payment',
   PaymentGeneral: '/api/v1/payment/general',
   PaymentCharity: '/api/v1/payment/charity',
+
+  // user
+  User:'/api/v1/user',
+  //approval
+  Approval: '/api/v1/approval',
 }
 
 export const BASE_HEADERS = {

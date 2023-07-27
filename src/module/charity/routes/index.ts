@@ -1,6 +1,6 @@
 import express from 'express'
 import {
-  acceptCharity,
+  updateStatusCharity,
   crateCharity,
   deleteCharity,
   getAllCharity,
@@ -21,9 +21,12 @@ import {
 const router = express.Router()
 
 // Get Router
-router.route('/').get([verifyAnonymousToken], getAllCharity)
-router.route('/:id').get([verifyAnonymousToken], getCharityById)
-router.route('/slug/:id').get([verifyAnonymousToken], getCharityBySlug)
+router.route('/').get(getAllCharity)
+router.route('/:id').get(getCharityById)
+router.route('/slug/:id').get(getCharityBySlug)
+// router.route('/').get([verifyAnonymousToken], getAllCharity)
+// router.route('/:id').get([verifyAnonymousToken], getCharityById)
+// router.route('/slug/:id').get([verifyAnonymousToken], getCharityBySlug)
 
 // Post Router
 router.route('/').post([verifyToken, adminAndUserVerifiedAccess], crateCharity)
@@ -34,7 +37,9 @@ router
   .route('/:id')
   .patch([verifyToken, adminAndUserVerifiedAccess], updateCharity)
 // accept charity
-router.route('/:id/status').patch([verifyToken, adminAccess], acceptCharity)
+router
+  .route('/update-status/:id')
+  .patch([verifyToken, adminAccess], updateStatusCharity)
 // upload image
 router.route('/upload').post(uploadCharitymedia)
 

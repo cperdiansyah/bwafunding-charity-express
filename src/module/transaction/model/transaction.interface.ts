@@ -11,7 +11,7 @@ export type statusTransaction =
 
 export interface ITransaction {
   user_id?: Types.ObjectId
-  transaction_type?: 'campaign' | 'sedekah-subuh'
+  transaction_type: 'campaign' | 'sedekah-subuh'
   campaign_id?: Types.ObjectId
   status?: statusTransaction
   quantity?: number

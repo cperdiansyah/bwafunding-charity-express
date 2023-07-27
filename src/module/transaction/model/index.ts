@@ -1,8 +1,5 @@
 import mongoose, { Schema } from 'mongoose'
-import {
-  ITransaction,
-  IResponseMidtrans,
-} from './transaction.interface.js'
+import { ITransaction, IResponseMidtrans } from './transaction.interface.js'
 
 const Midtrans_Response: Schema<IResponseMidtrans> = new mongoose.Schema({
   redirect_url: {
@@ -46,6 +43,11 @@ const transactionSchema: Schema<ITransaction> = new mongoose.Schema(
     response_midtrans: {
       type: Midtrans_Response,
       default: null,
+    },
+    transaction_type: {
+      type: String,
+      required: [true, 'amount is required'],
+      default: 'campaign',
     },
   },
   { timestamps: true }

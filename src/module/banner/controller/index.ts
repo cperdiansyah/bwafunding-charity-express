@@ -3,6 +3,8 @@ import mongoose from 'mongoose'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import Banner from '../model/index.js'
 import { IBanner } from '../model/banner.interface.js'
+import { IApproval } from '../../approval/model/approval.interface.js'
+import { SERVICE, api } from '../../../utils/api.js'
 
 // @desc Fetch all banners
 // @route GET /api/v1/banner
@@ -15,15 +17,29 @@ export const getAllBanner = async (
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
+    const status = (req.query.status as string) || 'accept' // get status from query params
 
-    const totalCount = await Banner.countDocuments({})
-    const totalPages = Math.ceil(totalCount / rows)
     const currentDate = new Date()
+    const filter: any = { end_date: { $gte: currentDate } }
 
+    if (status) {
+      // check if status is one of 'pending', 'active', 'rejected', 'all'
+      if (['pending', 'accept', 'rejected', 'all'].includes(status)) {
+        // only add status to filter if it is not 'all'
+        if (status !== 'all') {
+          filter.status = status
+        }
+      } else {
+        return res.status(400).json({
+          error:
+            "Invalid status. Status should be one of 'pending', 'active', 'rejected', 'all'",
+        })
+      }
+    }
+    const totalCount = await Banner.countDocuments(filter)
+    const totalPages = Math.ceil(totalCount / rows)
 
-    const banners: IBanner[] = await Banner.find({
-      end_date: { $gte: currentDate },
-    })
+    const banners: IBanner[] = await Banner.find(filter)
       .sort({ end_date: -1 })
       .skip((page - 1) * rows)
       .limit(rows)
@@ -89,22 +105,25 @@ export const crateBanner = async (
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    const {
+    let {
       title,
-      // content,
-      status,
       start_date,
       end_date,
       image,
       redirection_link,
+      status = 'pending',
     } = req.body
 
-    const { id: userId } = req.body.user
+    const { id: userId, accessToken, role } = req.body.user //user data
+
+    if (role === 'admin') {
+      status = 'accept'
+    }
+
     // Create a new banner instance
     const dataBanner = {
       author: userId,
       title,
-      // content,
       status,
       start_date,
       end_date,
@@ -113,6 +132,19 @@ export const crateBanner = async (
     }
 
     const newCharity = await Banner.create(dataBanner)
+
+    const dataApproval: IApproval = {
+      approval_type: 'banner',
+      foreign_id: newCharity._id,
+      status,
+      refModel: 'Banner',
+    }
+
+    await api.post(`${SERVICE.Approval}/create`, dataApproval, {
+      headers: {
+        Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+      },
+    })
     await session.commitTransaction()
     session.endSession()
 
@@ -140,15 +172,8 @@ export const updateBanner = async (
   session.startTransaction()
   try {
     const { id } = req.params // ID of the banner to update
-    const {
-      title,
-      content,
-      status,
-      start_date,
-      end_date,
-      image,
-      redirection_link,
-    } = req.body
+    const { title, content, start_date, end_date, image, redirection_link } =
+      req.body
 
     const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
 
@@ -174,7 +199,6 @@ export const updateBanner = async (
       author: userId,
       title,
       content,
-      status,
       start_date,
       end_date,
       image,
@@ -183,8 +207,85 @@ export const updateBanner = async (
 
     const result = await Banner.updateOne({ _id: id }, { $set: dataBanner })
     if (result.modifiedCount === 0) {
-      return res.status(200).json({ message: 'No changes made to the charity' })
+      return res.status(200).json({ message: 'No changes made to the banner' })
     }
+
+    // Retrieve the updated banner
+    const updatedBanner = await Banner.findById(id)
+
+    await session.commitTransaction()
+    session.endSession()
+    return res.status(200).json({
+      status: 'success',
+      message: 'Banner updated successfully',
+      content: updatedBanner,
+    })
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    return errorHandler(error, res)
+  }
+}
+// desc update charity
+// @route patch /api/v1/banner/update-status/:id
+// @access Private
+export const updateStatusBanner = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const { id } = req.params // ID of the charity to update
+    const { status } = req.body // Updated data
+    const { accessToken, role } = req.body.user //user data
+
+    const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
+
+    // Find the charity by ID and check if the author matches the user ID
+    const existingBanner = await Banner.findById(id)
+    if (!existingBanner) {
+      return res
+        .status(404)
+        .json({ error: { code: 404, message: 'Banner not found' } })
+    }
+
+    // Check if the user making the request is the author of the banner
+    if (existingBanner?.author?.toString() !== userId && role !== 'admin') {
+      return res.status(403).json({
+        error: {
+          code: 403,
+          message: 'You are not authorized to update this banner',
+        },
+      })
+    }
+
+    const dataBanner = {
+      status,
+    }
+
+    const result = await Banner.updateOne({ _id: id }, { $set: dataBanner })
+    if (result.modifiedCount === 0) {
+      return res.status(200).json({ message: 'No changes made to the banner' })
+    }
+
+    const dataApproval: IApproval = {
+      approval_type: 'banner',
+      foreign_id: existingBanner._id,
+      status,
+      refModel:'Banner'
+    }
+
+    await api.patch(
+      `${SERVICE.Approval}/update-by-foreign-id/${existingBanner._id}`,
+      dataApproval,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+        },
+      }
+    )
 
     // Retrieve the updated banner
     const updatedBanner = await Banner.findById(id)

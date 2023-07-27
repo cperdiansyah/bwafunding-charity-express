@@ -6,6 +6,7 @@ import {
   getAllBanner,
   getBannerById,
   updateBanner,
+  updateStatusBanner,
 } from '../controller/index.js'
 import {
   adminAccess,
@@ -14,8 +15,10 @@ import {
 const router = express.Router()
 
 // Get Method
-router.route('/').get([verifyToken], getAllBanner)
-router.route('/:id').get([verifyToken], getBannerById)
+router.route('/').get(getAllBanner)
+router.route('/:id').get(getBannerById)
+// router.route('/').get([verifyToken], getAllBanner)
+// router.route('/:id').get([verifyToken], getBannerById)
 
 // Post Media
 // router.route('/list').post([verifyToken], getAllBanner)
@@ -26,6 +29,9 @@ router.route('/create').post([verifyToken], crateBanner)
 router
   .route('/:id')
   .patch([verifyToken, adminAndUserVerifiedAccess], updateBanner)
+router
+  .route('/update-status/:id')
+  .patch([verifyToken, adminAndUserVerifiedAccess], updateStatusBanner)
 
 // Delete Router
 router.route('/:id').delete([verifyToken, adminAccess], deleteBanner)

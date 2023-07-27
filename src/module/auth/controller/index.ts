@@ -13,6 +13,8 @@ import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { IAnonymousToken, ITokenPayload } from '../../../types/index.js'
 import mongoose from 'mongoose'
 import { cookiesOptions } from '../../../utils/helpers/index.js'
+import { IApproval } from '../../approval/model/approval.interface.js'
+import { SERVICE, api } from '../../../utils/api.js'
 
 export const login = async (req: Request, res: Response) => {
   const session = await mongoose.startSession()
@@ -82,6 +84,7 @@ export const login = async (req: Request, res: Response) => {
         email: user.email,
         role: user.role,
         id: user._id,
+        is_verified: user.is_verified,
         accessToken,
       })
       .end()
@@ -166,11 +169,14 @@ export const register = async (req: Request, res: Response) => {
       password: hashPassword,
     })
 
+    /* Generate JWT */
+
     const userData = {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
       is_verified: newUser.is_verified,
+      isAuthenticated: true,
     }
 
     const accessToken = jwt.sign(userData, JWT_ACCESS_TOKEN_SECRET, {
@@ -180,8 +186,24 @@ export const register = async (req: Request, res: Response) => {
     const refreshToken = jwt.sign(userData, JWT_REFRESH_TOKEN_SECRET, {
       expiresIn: REFRESH_TOKEN_EXPIRED || '7d',
     })
+
     res.clearCookie('refreshAnonToken')
     res.cookie('refreshToken', refreshToken, cookiesOptions)
+
+    /* Create Data Approval */
+    const dataApproval: IApproval = {
+      approval_type: 'user',
+      foreign_id: newUser._id,
+      refModel: 'User',
+      status: 'pending',
+    }
+
+    await api.post(`${SERVICE.Approval}/create`, dataApproval, {
+      headers: {
+        Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+      },
+    })
+
     await session.commitTransaction()
     session.endSession()
 
@@ -191,6 +213,7 @@ export const register = async (req: Request, res: Response) => {
       role: newUser.role,
       id: newUser._id,
       accessToken,
+      is_verified: newUser.is_verified,
     })
   } catch (err) {
     await session.abortTransaction()
