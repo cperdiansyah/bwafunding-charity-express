@@ -4,6 +4,7 @@ export interface IApproval {
   status?: 'accept' | 'rejected' | 'pending'
   approval_type: 'charity' | 'user' | 'banner'
   foreign_id: Types.ObjectId | null
+  refModel?: 'User' | 'Charity' | 'Banner'
 }
 
 export interface IApprovalUser {

@@ -13,7 +13,13 @@ const approvalSchema: Schema<IApproval> = new mongoose.Schema(
     },
     foreign_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User' || 'Charity' || 'Banner',
+      // ref: 'User' || 'Charity' || 'Banner',
+      required: true,
+    },
+    refModel: {
+      type: String,
+      required: true,
+      enum: ['User', 'Charity', 'Banner'], // The model that foreign_id references
     },
   },
   { timestamps: true }

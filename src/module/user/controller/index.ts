@@ -11,9 +11,16 @@ import { IUser } from '../model/userInterface.js'
 // @route GET /api/v1/user/me
 // @access Private
 export const getMe = async (req: Request, res: Response) => {
-  const { _id } = req.body.user //user data
-
   try {
+    const { _id } = req.body.user //user data
+    if (!_id) {
+      return res.status(400).json({
+        error: {
+          code: 400,
+          message: 'Bad request',
+        },
+      })
+    }
     const user: IUser | null = await User.findById(_id).select(
       '-__v -password -refresh_token'
     )
@@ -28,6 +35,7 @@ export const getMe = async (req: Request, res: Response) => {
     return res.status(200).json({
       user,
     })
+    // res.status(200)
   } catch (error) {
     return errorHandler(error, res)
   }

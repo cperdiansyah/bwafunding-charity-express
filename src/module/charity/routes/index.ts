@@ -21,9 +21,12 @@ import {
 const router = express.Router()
 
 // Get Router
-router.route('/').get([verifyAnonymousToken], getAllCharity)
-router.route('/:id').get([verifyAnonymousToken], getCharityById)
-router.route('/slug/:id').get([verifyAnonymousToken], getCharityBySlug)
+router.route('/').get(getAllCharity)
+router.route('/:id').get(getCharityById)
+router.route('/slug/:id').get(getCharityBySlug)
+// router.route('/').get([verifyAnonymousToken], getAllCharity)
+// router.route('/:id').get([verifyAnonymousToken], getCharityById)
+// router.route('/slug/:id').get([verifyAnonymousToken], getCharityBySlug)
 
 // Post Router
 router.route('/').post([verifyToken, adminAndUserVerifiedAccess], crateCharity)

@@ -16,6 +16,11 @@ import { __dirname } from '../../../utils/index.js'
 import multer from 'multer'
 import { IApproval } from '../../approval/model/approval.interface.js'
 import { SERVICE, api } from '../../../utils/api.js'
+export interface CustomRequest extends Request {
+  headers: {
+    authorization?: string
+  }
+}
 
 // @desc Fetch all charities
 // @route GET /api/v1/charity
@@ -28,14 +33,46 @@ export const getAllCharity = async (
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
+    // console.log()
 
-    const totalCount = await Charity.countDocuments({})
+    const status = (req.query.status as string) || 'accept' // get status from query params
+
+    const filter: any = { end_date: { $gte: new Date() } }
+
+    if (status) {
+      // check if status is one of 'pending', 'active', 'rejected'
+      if (['pending', 'accept', 'rejected', 'all'].includes(status)) {
+        // filter.status = status
+        if (status !== 'all') {
+          filter.status = status
+        }
+      } else {
+        return res.status(400).json({
+          error:
+            "Invalid status. Status should be one of 'pending', 'active', 'rejected'",
+        })
+      }
+    }
+    if (
+      req?.headers?.authorization &&
+      req?.headers?.authorization?.length > 6
+    ) {
+      const getMe = await api.get(`${SERVICE.User}/me`, {
+        headers: {
+          Authorization: `${req?.headers.authorization}`,
+        },
+      })
+      const dataMe = getMe.data.user
+      if (dataMe.role === 'user' && status === 'all') {
+        filter.author = dataMe._id
+      }
+    }
+
+    const totalCount = await Charity.countDocuments(filter)
+    // console.log(totalCount)
     const totalPages = Math.ceil(totalCount / rows)
-    const currentDate = new Date()
 
-    const charities: ICharity[] = await Charity.find({
-      end_date: { $gte: currentDate },
-    })
+    const charities: ICharity[] = await Charity.find(filter)
       .sort({ end_date: 1 })
       .skip((page - 1) * rows)
       .limit(rows)
@@ -145,15 +182,14 @@ export const crateCharity = async (
       media,
     } = req.body
 
-    const { id: userId, role, accessToken } = req.body.user
-
+    const { id: userId, _id: user_id, role, accessToken } = req.body.user
     if (role === 'admin') {
       status = 'accept'
     }
 
     const dataCharity: ICharity = {
       slug: slugify(title),
-      author: userId,
+      author: userId || user_id,
       title,
       description,
       donation_target,
@@ -171,6 +207,7 @@ export const crateCharity = async (
       approval_type: 'charity',
       foreign_id: charity._id,
       status,
+      refModel: 'Charity',
     }
     await api.post(`${SERVICE.Approval}/create`, dataApproval, {
       headers: {
@@ -307,6 +344,7 @@ export const updateStatusCharity = async (
       approval_type: 'charity',
       foreign_id: existingCharity._id,
       status,
+      refModel: 'Charity',
     }
 
     await api.patch(
@@ -328,6 +366,8 @@ export const updateStatusCharity = async (
       message: 'Charity updated successfully',
     })
   } catch (error) {
+    console.log(error)
+
     await session.abortTransaction()
     session.endSession()
     return errorHandler(error, res)

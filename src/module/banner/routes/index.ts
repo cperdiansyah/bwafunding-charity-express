@@ -15,8 +15,10 @@ import {
 const router = express.Router()
 
 // Get Method
-router.route('/').get([verifyToken], getAllBanner)
-router.route('/:id').get([verifyToken], getBannerById)
+router.route('/').get(getAllBanner)
+router.route('/:id').get(getBannerById)
+// router.route('/').get([verifyToken], getAllBanner)
+// router.route('/:id').get([verifyToken], getBannerById)
 
 // Post Media
 // router.route('/list').post([verifyToken], getAllBanner)
