@@ -1,14 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
-import { genSaltSync, hashSync } from 'bcrypt-ts'
+import dayjs from 'dayjs'
+
+/* model */
+import Poin from '../model/index.js'
+import PoinHistory from '../model/poinHistory.js'
 
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
-import { IApproval } from '../../approval/model/approval.interface.js'
-import { SERVICE, api } from '../../../utils/api.js'
-import Poin from '../model/index.js'
 import { IPoin, IPoinHistory, historyType } from '../model/poin.interface.js'
-import dayjs from 'dayjs'
-import PoinHistory from '../model/poinHistory.js'
 
 // desc get point
 // @route GET /api/v1/point/me
@@ -25,7 +24,9 @@ export const getPoinByUserId = async (req: Request, res: Response) => {
         },
       })
     }
-    const poin: IPoin | null = await Poin.findOne({ id_user: userId })
+    const poin: IPoin | null = await Poin.findOne({ id_user: userId }).select(
+      '-__v'
+    )
 
     if (poin === null) {
       return res.status(404).json({
@@ -117,13 +118,20 @@ export const createPoint = async (
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
     const {
-      value,
+      value = 0,
+      userId,
     }: {
-      value: number
-      type: historyType
-    } = req.body // Updated data
+      userId: string
+      value?: number
+    } = req.body /* Body requst */
+
+    if (!userId) {
+      return res.status(400).json({
+        code: 400,
+        message: 'Userid  not found',
+      })
+    }
 
     const existingPoin: IPoin | null = await Poin.findOne({
       id_user: userId,
@@ -134,10 +142,13 @@ export const createPoint = async (
     }
 
     const dataPoin: IPoin = {
-      id_user: userId,
+      id_user: new mongoose.Types.ObjectId(userId),
       value,
     }
     await Poin.create(dataPoin)
+
+    await session.commitTransaction()
+    session.endSession()
 
     return res.status(200).json({
       status: 'success',
@@ -146,6 +157,7 @@ export const createPoint = async (
   } catch (error) {
     await session.abortTransaction()
     session.endSession()
+    console.log(error)
     return errorHandler(error, res)
   }
 }
@@ -162,7 +174,6 @@ export const updatePoin = async (
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    // const { id } = req.params // ID of the charity to update
     const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
     const {
       value,
@@ -172,8 +183,7 @@ export const updatePoin = async (
       type: historyType
     } = req.body // Updated data
 
-    // Find the charity by ID and check if the author matches the user ID
-    // const existingCharity = await Poin.findById(id)
+    // Find the point by user ID
     const existingPoin: IPoin | null = await Poin.findOne({
       id_user: userId,
     })
@@ -183,7 +193,7 @@ export const updatePoin = async (
         .status(404)
         .json({ error: { code: 404, message: 'Point not found' } })
     }
-    // Check if the user making the request is the author of the charity
+    
     let dataPoin: IPoin = {
       id_user: existingPoin.id_user,
       updatedAt: dayjs().toDate(),

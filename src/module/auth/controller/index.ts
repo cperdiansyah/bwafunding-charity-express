@@ -204,6 +204,19 @@ export const register = async (req: Request, res: Response) => {
       },
     })
 
+    /* Create wallet */
+    await api.post(
+      `${SERVICE.Point}/create`,
+      {
+        userId:  newUser._id
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+        },
+      }
+    )
+
     await session.commitTransaction()
     session.endSession()
 

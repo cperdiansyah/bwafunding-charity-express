@@ -9,9 +9,11 @@ export const SERVICE = {
   PaymentCharity: '/api/v1/payment/charity',
 
   // user
-  User:'/api/v1/user',
+  User: '/api/v1/user',
   //approval
   Approval: '/api/v1/approval',
+  // Poin
+  Point: '/api/v1/point',
 }
 
 export const BASE_HEADERS = {
