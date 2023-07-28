@@ -7,7 +7,7 @@ export interface ICharity {
   description: string
   status: 'accept' | 'pending' | 'rejected' | 'completed'
   is_draft: boolean
-  donation_target: number
+  donation_target?: number
   start_date: Date
   end_date: Date | null
   post_date: Date | null

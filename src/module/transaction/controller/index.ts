@@ -310,7 +310,7 @@ export const chargeTransaction = async (req: Request, res: Response) => {
 
     const calculateAmount = calculateTotalAmount(transaction)
 
-    if (calculateAmount > charity?.donation_target) {
+    if (calculateAmount > (charity?.donation_target || 0)) {
       return res.status(406).json({
         error: {
           code: 406,

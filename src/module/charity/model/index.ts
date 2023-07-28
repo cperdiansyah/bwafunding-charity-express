@@ -33,7 +33,8 @@ const charitySchema: Schema<ICharity> = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: [true, 'description is required'],
+      // required: [true, 'description is required'],
+      default: '',
     },
     status: {
       type: String,
@@ -46,8 +47,8 @@ const charitySchema: Schema<ICharity> = new mongoose.Schema(
     },
     donation_target: {
       type: Number,
-      min: 0,
-      required: [true, 'donation target is required'],
+      // required: [true, 'donation target is required'],
+      default: null,
     },
     start_date: {
       type: Date,
