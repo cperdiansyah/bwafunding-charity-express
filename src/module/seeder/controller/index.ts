@@ -34,9 +34,9 @@ export const importData = async (req: Request, res: Response) => {
       author: new Types.ObjectId(adminUser),
     }))
 
-    await Banner.insertMany(mappedBanners)
+    // await Banner.insertMany(mappedBanners)
 
-    await Charity.insertMany(mappedCharity)
+    // await Charity.insertMany(mappedCharity)
 
     res.status(200).json({
       status: 'success',

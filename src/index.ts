@@ -25,6 +25,7 @@ import bannerRoutes from './module/banner/routes/index.js'
 import transactionRoutes from './module/transaction/routes/index.js'
 import approvalRoutes from './module/approval/routes/index.js'
 import userRoutes from './module/user/routes/index.js'
+import pointRoutes from './module/poin/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -106,6 +107,9 @@ app.use('/api/v1/transaction', transactionRoutes)
 
 /* Approval routes */
 app.use('/api/v1/approval', approvalRoutes)
+
+/* Approval Point */
+app.use('/api/v1/point', pointRoutes)
 
 // Seeder route
 if (NODE_ENV?.trim() === 'development') {
