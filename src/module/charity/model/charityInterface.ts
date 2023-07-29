@@ -38,5 +38,5 @@ export interface ICharityFundHistory {
   timestamp?: number
   // funding_status?: 'pending' | 'settled' | 'funded'
   funding_status?: statusTransaction
-  charity_history_type?: historyType
+  history_type?: historyType
 }

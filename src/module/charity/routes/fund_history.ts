@@ -29,6 +29,6 @@ router.route('/create').post([verifyToken], crateCharityFundingHistory)
 router.route('/update/:id').patch([verifyToken], updateCharityFundingHistory)
 router
   .route('/update/transaction/:id')
-  .patch([verifyToken], updateCharityFundingHistoryByTransactionId)
+  .patch(updateCharityFundingHistoryByTransactionId)
 
 export default router

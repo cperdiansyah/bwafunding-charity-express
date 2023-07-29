@@ -4,6 +4,8 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 export const SERVICE = {
+  Charity: '/api/v1/charity',
+  CharityHistory: '/api/v1/charity/funding-history',
   Payment: '/api/v1/payment',
   PaymentGeneral: '/api/v1/payment/general',
   PaymentCharity: '/api/v1/payment/charity',

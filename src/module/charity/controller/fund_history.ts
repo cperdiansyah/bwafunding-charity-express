@@ -161,16 +161,17 @@ export const crateCharityFundingHistory = async (
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    let { campaign_id, transaction_id, status = 'pending' } = req.body
+    let { campaign_id, transaction_id, status = 'pending', history_type } = req.body
 
-    const dataApproval: ICharityFundHistory = {
+    const dataCharityFundingHistory: ICharityFundHistory = {
       campaign_id,
       transaction_id,
+      history_type,
       funding_status: status,
       timestamp: dayjs().unix(),
     }
 
-    const approval = await CharityFundHistory.create(dataApproval)
+    const approval = await CharityFundHistory.create(dataCharityFundingHistory)
     await session.commitTransaction()
     session.endSession()
 
@@ -265,7 +266,7 @@ export const updateCharityFundingHistoryByTransactionId = async (
     }
 
     const updatedApproval = await CharityFundHistory.updateOne(
-      { _id: id },
+      { _id: existingApproval.id },
       { $set: dataApproval }
     )
     if (updatedApproval.modifiedCount === 0) {

@@ -18,6 +18,8 @@ import User from '../../user/model/index.js'
 import Charity from '../../charity/model/index.js'
 import { ITransaction } from '../model/transaction.interface.js'
 import axios from 'axios'
+import { SERVICE, api } from '../../../utils/api.js'
+import { ICharityFundHistory } from '../../charity/model/charityInterface.js'
 
 const snap = new MidtransClient.Snap({
   isProduction: false,
@@ -388,6 +390,18 @@ export const chargeTransaction = async (req: Request, res: Response) => {
       { new: true }
     )
 
+    /* Create Charity Funding History */
+    const dataCharityHistory: ICharityFundHistory = {
+      campaign_id,
+      transaction_id: DataTransaction._id,
+      history_type: 'add',
+    }
+    await api.post(`${SERVICE.CharityHistory}/create`, dataCharityHistory, {
+      headers: {
+        Authorization: `${req?.headers.authorization}`,
+      },
+    })
+
     await session.commitTransaction()
     session.endSession()
 
@@ -503,6 +517,18 @@ export const chargeTransactionSedekahSubuh = async (
       { new: true }
     )
 
+    /* Create Charity Funding History */
+    const dataCharityHistory: ICharityFundHistory = {
+      campaign_id: sedekahSubuh?._id,
+      transaction_id: DataTransaction._id,
+      history_type: 'add',
+    }
+    await api.post(`${SERVICE.CharityHistory}/create`, dataCharityHistory, {
+      headers: {
+        Authorization: `${req?.headers.authorization}`,
+      },
+    })
+
     await session.commitTransaction()
     session.endSession()
 
@@ -544,6 +570,16 @@ export const notificationPush = async (req: Request, res: Response) => {
       { _id: order_id },
       { $set: { status: transaction_status } },
       { new: true }
+    )
+
+    /* Updated charity fund history */
+    const dataCharityFundingHistory = {
+      campaign_id: new mongoose.Types.ObjectId(updatedTransaction?.campaign_id),
+      status: transaction_status,
+    }
+    await api.patch(
+      `${SERVICE.CharityHistory}/update/transaction/${order_id}`,
+      dataCharityFundingHistory
     )
 
     await session.commitTransaction()
