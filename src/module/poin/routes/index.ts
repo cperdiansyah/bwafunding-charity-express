@@ -1,7 +1,12 @@
 import express from 'express'
 import { verifyToken } from '../../../middleware/verifyToken.js'
 import { adminAndUserVerifiedAccess } from '../../../middleware/authMiddleware.js'
-import { createPoint, getPoinByUserId, getPoinHistoryList } from '../controller/index.js'
+import {
+  createPoint,
+  getPoinByUserId,
+  getPoinHistoryList,
+  updatePoin,
+} from '../controller/index.js'
 
 const router = express.Router()
 
@@ -11,6 +16,9 @@ router.route('/history').get([verifyToken], getPoinHistoryList)
 
 /* Post Route */
 router.route('/create').post([verifyToken], createPoint)
+
+/* Patch Route */
+router.route('/update/user/:id').patch(updatePoin)
 
 // /* Patch Route */
 // router.route('/update/:id').patch([verifyToken], updateUser)

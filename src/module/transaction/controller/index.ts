@@ -563,7 +563,7 @@ export const notificationPush = async (req: Request, res: Response) => {
     }
 
     // Extract the necessary information from the notification
-    const { transaction_status, order_id } = req.body
+    const { transaction_status, order_id, gross_amount } = req.body
 
     // Update the transaction status in the database
     const updatedTransaction = await Transaction.findOneAndUpdate(
@@ -581,6 +581,24 @@ export const notificationPush = async (req: Request, res: Response) => {
       `${SERVICE.CharityHistory}/update/transaction/${order_id}`,
       dataCharityFundingHistory
     )
+
+    const campaign = await Charity.findById(updatedTransaction?.campaign_id)
+
+    /* Update point history */
+    if (campaign?.campaign_type === 'sedekah-subuh') {
+      /* Add point */
+      const dataPoint = {
+        value: gross_amount * 0.05,
+        type: 'add',
+      }
+      if (transaction_status === 'deny') {
+        dataPoint.type = 'subtract'
+      }
+      await api.patch(
+        `${SERVICE.Point}/update/user/${updatedTransaction?.user_id}`,
+        dataPoint
+      )
+    }
 
     await session.commitTransaction()
     session.endSession()

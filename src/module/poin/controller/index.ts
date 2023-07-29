@@ -174,7 +174,8 @@ export const updatePoin = async (
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
+    // const { id: userId } = req.body.user // Assuming user ID is retrieved from the JWT token
+    const { id: userId } = req.params // Assuming user ID is retrieved from the JWT token
     const {
       value,
       type,
@@ -193,20 +194,24 @@ export const updatePoin = async (
         .status(404)
         .json({ error: { code: 404, message: 'Point not found' } })
     }
-    
-    let dataPoin: IPoin = {
+
+    const dataPoin: IPoin = {
       id_user: existingPoin.id_user,
       updatedAt: dayjs().toDate(),
     }
-    if (existingPoin.value) {
-      if (type === 'add') {
-        dataPoin.value = existingPoin?.value + value
-      } else if (type === 'subtract') {
-        dataPoin.value = existingPoin?.value - value
-      }
+
+    if (type === 'add') {
+      dataPoin.value = (existingPoin?.value || 0) + value
+    } else if (type === 'subtract') {
+      dataPoin.value = (existingPoin?.value || 0) - value
     }
+
     /* Update poin wallet */
-    await Poin.findByIdAndUpdate({ _id: existingPoin._id }, { $set: dataPoin })
+    await Poin.findByIdAndUpdate(
+      { _id: existingPoin._id },
+      { $set: dataPoin },
+      { new: true }
+    )
 
     /* Add poin wallet history */
     const dataPoinHisotry: IPoinHistory = {
