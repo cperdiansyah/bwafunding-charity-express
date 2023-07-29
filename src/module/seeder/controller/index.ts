@@ -1,16 +1,19 @@
-import { Types } from 'mongoose'
+import mongoose, { Types } from 'mongoose'
 import { Request, Response } from 'express'
-import { ICharity } from '../../charity/model/charityInterface.js'
+import dayjs from 'dayjs'
 
 // Data
 import users from '../../../data/users.js'
 import charities from '../../../data/charity.js'
-
+/* Interface */
+import { ICharity } from '../../charity/model/charityInterface.js'
+import { IBanner } from '../../banner/model/banner.interface.js'
 // Model
 import User from '../../user/model/index.js'
 import Charity from '../../charity/model/index.js'
 import banners from '../../../data/banner.js'
-import { IBanner } from '../../banner/model/banner.interface.js'
+import Poin from '../../poin/model/index.js'
+import PoinHistory from '../../poin/model/poinHistory.js'
 import Banner from '../../banner/model/index.js'
 import Approval from '../../approval/model/index.js'
 import CharityFundHistory from '../../charity/model/fund_history.js'
@@ -18,12 +21,26 @@ import Transaction from '../../transaction/model/index.js'
 import ApprovalUser from '../../approval/model/approval_user.js'
 
 export const importData = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
   try {
+    const exclude = req.query.exclude as Array<
+      'banner' | 'charity' | 'sedekah-subuh'
+    >
+
     await destroy()
 
+    /* Seeder user */
     const createdUsers = await User.insertMany(users)
     const adminUser = createdUsers[0]._id
 
+    /* Seeder point */
+    const mappedUser = createdUsers.map((item) => ({
+      id_user: item._id,
+    }))
+    await Poin.insertMany(mappedUser)
+
+    /* Mapping data */
     const mappedCharity = charities.map((charity: ICharity) => ({
       ...charity,
       author: new Types.ObjectId(adminUser),
@@ -34,9 +51,32 @@ export const importData = async (req: Request, res: Response) => {
       author: new Types.ObjectId(adminUser),
     }))
 
-    await Banner.insertMany(mappedBanners)
+    if (!exclude?.includes('sedekah-subuh')) {
+      /* Create Sedekah subuh campaign */
+      const sedekahSubuh: ICharity = {
+        author: new Types.ObjectId(adminUser),
+        campaign_type: 'sedekah-subuh',
+        slug: 'sedekah-subuh',
+        title: 'Sedekah Subuh',
+        status: 'accept',
+        start_date: dayjs().toDate(),
+        is_draft: false,
+        description: '',
+        post_date: dayjs().toDate(),
+        end_date: null,
+      }
+      await Charity.create(sedekahSubuh)
+    }
 
-    await Charity.insertMany(mappedCharity)
+    if (!exclude?.includes('banner')) {
+      await Banner.insertMany(mappedBanners)
+    }
+
+    if (!exclude?.includes('charity')) {
+      await Charity.insertMany(mappedCharity)
+    }
+    await session.commitTransaction()
+    session.endSession()
 
     res.status(200).json({
       status: 'success',
@@ -46,6 +86,8 @@ export const importData = async (req: Request, res: Response) => {
     console.log('Data Imported...')
     // process.exit(0)
   } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
     console.log('Error: ', error)
     res.status(400).json({
       status: 'fail',
@@ -82,4 +124,6 @@ const destroy = async () => {
   await ApprovalUser.deleteMany({})
   await CharityFundHistory.deleteMany({})
   await Transaction.deleteMany({})
+  await Poin.deleteMany({})
+  await PoinHistory.deleteMany({})
 }

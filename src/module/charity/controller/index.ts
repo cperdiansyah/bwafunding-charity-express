@@ -33,11 +33,14 @@ export const getAllCharity = async (
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
-    // console.log()
+    const onGoing = req.query.onGoing
 
     const status = (req.query.status as string) || 'accept' // get status from query params
 
-    const filter: any = { end_date: { $gte: new Date() } }
+    const filter: any = {
+      end_date: { $gte: new Date() },
+      campaign_type: { $eq: 'campaign' },
+    }
 
     if (status) {
       // check if status is one of 'pending', 'active', 'rejected'
@@ -53,6 +56,10 @@ export const getAllCharity = async (
         })
       }
     }
+
+    // if (onGoing) {
+    //   filter.end_date = { $gte: new Date() }
+    // }
     if (
       req?.headers?.authorization &&
       req?.headers?.authorization?.length > 6

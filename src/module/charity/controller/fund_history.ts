@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
-import axios from 'axios'
 import CharityFundHistory from '../model/fund_history.js'
 import { ICharityFundHistory } from '../model/charityInterface.js'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
@@ -154,7 +153,7 @@ export const getCharityFundHistoryByTransactionId = async (
 // desc create approval request
 // @route POST /api/v1/approval/create
 // @access Private
-export const crateApproval = async (
+export const crateCharityFundingHistory = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -162,16 +161,17 @@ export const crateApproval = async (
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    let { campaign_id, transaction_id, status = 'pending' } = req.body
+    let { campaign_id, transaction_id, status = 'pending', history_type } = req.body
 
-    const dataApproval: ICharityFundHistory = {
+    const dataCharityFundingHistory: ICharityFundHistory = {
       campaign_id,
       transaction_id,
+      history_type,
       funding_status: status,
       timestamp: dayjs().unix(),
     }
 
-    const approval = await CharityFundHistory.create(dataApproval)
+    const approval = await CharityFundHistory.create(dataCharityFundingHistory)
     await session.commitTransaction()
     session.endSession()
 
@@ -189,7 +189,7 @@ export const crateApproval = async (
 // desc update approval request
 // @route POST /api/v1/approval/update/:id
 // @access Private
-export const updateApproval = async (
+export const updateCharityFundingHistory = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -217,6 +217,56 @@ export const updateApproval = async (
 
     const updatedApproval = await CharityFundHistory.updateOne(
       { _id: id },
+      { $set: dataApproval }
+    )
+    if (updatedApproval.modifiedCount === 0) {
+      return res.status(200).json({ message: 'No changes made to the charity' })
+    }
+
+    await session.commitTransaction()
+    session.endSession()
+    return res.status(200).json({
+      status: 'success',
+      message: 'Approval updated successfully',
+    })
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    return errorHandler(error, res)
+  }
+}
+// desc update approval request
+// @route POST /api/v1/approval/update/:id
+// @access Private
+export const updateCharityFundingHistoryByTransactionId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const { id } = req.params // ID of the approval to update
+    const { campaign_id, status } = req.body // Updated data
+
+    // Find the approval by ID
+    const existingApproval = await CharityFundHistory.findOne({
+      transaction_id: { $eq: id },
+    })
+    if (!existingApproval) {
+      return res
+        .status(404)
+        .json({ error: { code: 404, message: 'Campaign Fund History not found' } })
+    }
+
+    const dataApproval: ICharityFundHistory = {
+      campaign_id,
+      funding_status: status,
+      timestamp: dayjs().unix(),
+    }
+
+    const updatedApproval = await CharityFundHistory.updateOne(
+      { _id: existingApproval.id },
       { $set: dataApproval }
     )
     if (updatedApproval.modifiedCount === 0) {
