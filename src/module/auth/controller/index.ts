@@ -208,7 +208,7 @@ export const register = async (req: Request, res: Response) => {
     await api.post(
       `${SERVICE.Point}/create`,
       {
-        userId:  newUser._id
+        userId: newUser._id,
       },
       {
         headers: {

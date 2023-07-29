@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import cors from 'cors'
 import path from 'path'
+import bp from 'body-parser'
 
 import {
   CORS_LOCAL,
@@ -38,6 +39,10 @@ app.use('/storage', express.static(uploadFolder))
 if (process.env.NODE_ENV?.trim() === 'development') {
   app.use(morgan('dev'))
 }
+
+/* Body parser */
+app.use(bp.json())
+app.use(bp.urlencoded({ extended: true }))
 
 const whitelist: string[] = [CORS_LOCAL, ...CORS_OPEN?.split(', ')]
 

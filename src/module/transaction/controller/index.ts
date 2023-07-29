@@ -261,18 +261,15 @@ export const getPaymentByIdUser = async (
     return errorHandler(error, res)
   }
 }
-// desc create transaction
-// @route GET /api/v1/transcation/list
+// desc charge transaction
+// @route GET /api/v1/transcation/charge
 // @access Private
-
 export const chargeTransaction = async (req: Request, res: Response) => {
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    const { _id: user_id } = req.body.user //user data
-
     const {
-      // user_id,
+      user_id,
       campaign_id,
       quantity = 1,
       amount,
@@ -323,7 +320,6 @@ export const chargeTransaction = async (req: Request, res: Response) => {
         },
       })
     }
-
     /* End check */
 
     /* Check amount is noit 0 or is number */
@@ -377,6 +373,121 @@ export const chargeTransaction = async (req: Request, res: Response) => {
           quantity: 1,
           name: charity.title,
           url: `${clientHost}/campaign/${charity.slug}`,
+        },
+      ],
+    }
+    const midtransCharge = await snap
+      .createTransaction(dataMidtransCharge)
+      .then((transaction) => {
+        return transaction
+      })
+
+    const updatedTransaction = await Transaction.findByIdAndUpdate(
+      DataTransaction.id,
+      { response_midtrans: midtransCharge },
+      { new: true }
+    )
+
+    await session.commitTransaction()
+    session.endSession()
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Payment campaign created successfully',
+      content: updatedTransaction,
+    })
+  } catch (error) {
+    console.log(error)
+    await session.abortTransaction()
+    session.endSession()
+    return errorHandler(error, res)
+  }
+}
+
+// desc charge transaction
+// @route GET /api/v1/transcation/charge/sedekah-subuh
+// @access Private
+export const chargeTransactionSedekahSubuh = async (
+  req: Request,
+  res: Response
+) => {
+  const session = await mongoose.startSession()
+  session.startTransaction()
+  try {
+    const {
+      user_id,
+      amount,
+      quantity = 1,
+      transaction_type = 'sedekah-subuh',
+    } = req.body
+    /* Check user and charity is exist */
+    const user = await User.findOne({
+      _id: user_id,
+    })
+    if (!user) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'User not found',
+        },
+      })
+    }
+
+    const sedekahSubuh = await Charity.findOne({
+      campaign_type: { $eq: 'sedekah-subuh' },
+    })
+
+    /* Check amount is noit 0 or is number */
+    if (amount === 0) {
+      return res.status(400).json({
+        error: {
+          code: 400,
+          message: 'amount must be greater than 0',
+        },
+      })
+    } else if (typeof amount !== 'number') {
+      return res.status(400).json({
+        error: {
+          code: 400,
+          message: 'amount must be in the form of a number',
+        },
+      })
+    }
+
+    /* Create Midtrans Payment */
+    const clientHost =
+      process.env.NODE_ENV?.trim() === 'development'
+        ? process.env.CORS_LOCAL
+        : process.env.CORS_OPEN
+
+    const dataPayment: ITransaction = {
+      user_id,
+      campaign_id: sedekahSubuh?._id,
+      quantity,
+      amount,
+      status: 'pending',
+      transaction_type,
+    }
+
+    /* Create payment campaign */
+    const DataTransaction = await Transaction.create(dataPayment)
+    const dataMidtransCharge = {
+      transaction_details: {
+        order_id: DataTransaction._id,
+        gross_amount: DataTransaction.amount,
+      },
+      customer_details: {
+        first_name: user.name.split(' ')[0],
+        last_name: user.name.split(' ')[1] || '',
+        email: user.email,
+      },
+      item_details: [
+        {
+          id: String(sedekahSubuh?._id),
+          price: DataTransaction.amount,
+          quantity: 1,
+          name: sedekahSubuh?.title,
+          url: `${clientHost}/campaign/${sedekahSubuh?.slug}`,
         },
       ],
     }
