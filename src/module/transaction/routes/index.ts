@@ -14,7 +14,7 @@ import { verifyToken } from '../../../middleware/verifyToken.js'
 // import { midtransWebhook, processTransaction } from '../controller/index.js'
 const router = express.Router()
 /* Get */
-router.route('/list').get([verifyToken], getAllCharityPayment)
+router.route('/list').get(getAllCharityPayment)
 router.route('/:id').get([verifyToken], getPaymentById)
 router.route('/user/:id').get([verifyToken], getPaymentByIdUser)
 router.route('/charity/:id').get([verifyToken], gePaymentByIdCharity)
