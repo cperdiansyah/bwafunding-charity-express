@@ -34,13 +34,16 @@ export const getAllCharityPayment = async (
   next: NextFunction
 ) => {
   try {
-    const { getAll, campaign_ids } = req.query
+    const { getAll, campaign_ids, transaction_type = 'campaign' } = req.query
     const query: any = {}
     if (req.query.status) {
       query.status = req.query.status
     }
     if (campaign_ids) {
       query.campaign_id = { $in: campaign_ids }
+    }
+    if (transaction_type) {
+      query.transaction_type = { $in: transaction_type }
     }
     const totalCount = await Transaction.countDocuments(query)
 
@@ -266,8 +269,10 @@ export const chargeTransaction = async (req: Request, res: Response) => {
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
+    const { _id: user_id } = req.body.user //user data
+
     const {
-      user_id,
+      // user_id,
       campaign_id,
       quantity = 1,
       amount,

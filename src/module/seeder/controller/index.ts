@@ -1,22 +1,24 @@
 import mongoose, { Types } from 'mongoose'
 import { Request, Response } from 'express'
-import { ICharity } from '../../charity/model/charityInterface.js'
+import dayjs from 'dayjs'
 
 // Data
 import users from '../../../data/users.js'
 import charities from '../../../data/charity.js'
-
+/* Interface */
+import { ICharity } from '../../charity/model/charityInterface.js'
+import { IBanner } from '../../banner/model/banner.interface.js'
 // Model
 import User from '../../user/model/index.js'
 import Charity from '../../charity/model/index.js'
 import banners from '../../../data/banner.js'
-import { IBanner } from '../../banner/model/banner.interface.js'
+import Poin from '../../poin/model/index.js'
+import PoinHistory from '../../poin/model/poinHistory.js'
 import Banner from '../../banner/model/index.js'
 import Approval from '../../approval/model/index.js'
 import CharityFundHistory from '../../charity/model/fund_history.js'
 import Transaction from '../../transaction/model/index.js'
 import ApprovalUser from '../../approval/model/approval_user.js'
-import dayjs from 'dayjs'
 
 export const importData = async (req: Request, res: Response) => {
   const session = await mongoose.startSession()
@@ -28,9 +30,17 @@ export const importData = async (req: Request, res: Response) => {
 
     await destroy()
 
+    /* Seeder user */
     const createdUsers = await User.insertMany(users)
     const adminUser = createdUsers[0]._id
 
+    /* Seeder point */
+    const mappedUser = createdUsers.map((item) => ({
+      id_user: item._id,
+    }))
+    await Poin.insertMany(mappedUser)
+
+    /* Mapping data */
     const mappedCharity = charities.map((charity: ICharity) => ({
       ...charity,
       author: new Types.ObjectId(adminUser),
@@ -41,7 +51,7 @@ export const importData = async (req: Request, res: Response) => {
       author: new Types.ObjectId(adminUser),
     }))
 
-    if (!exclude.includes('sedekah-subuh')) {
+    if (!exclude?.includes('sedekah-subuh')) {
       /* Create Sedekah subuh campaign */
       const sedekahSubuh: ICharity = {
         author: new Types.ObjectId(adminUser),
@@ -58,11 +68,11 @@ export const importData = async (req: Request, res: Response) => {
       await Charity.create(sedekahSubuh)
     }
 
-    if (!exclude.includes('banner')) {
+    if (!exclude?.includes('banner')) {
       await Banner.insertMany(mappedBanners)
     }
 
-    if (!exclude.includes('charity')) {
+    if (!exclude?.includes('charity')) {
       await Charity.insertMany(mappedCharity)
     }
     await session.commitTransaction()
@@ -114,4 +124,6 @@ const destroy = async () => {
   await ApprovalUser.deleteMany({})
   await CharityFundHistory.deleteMany({})
   await Transaction.deleteMany({})
+  await Poin.deleteMany({})
+  await PoinHistory.deleteMany({})
 }

@@ -12,6 +12,7 @@ const poinSchema: Schema<IPoin> = new mongoose.Schema(
     value: {
       type: Number,
       required: [true, 'value is required'],
+      default: 0,
     },
   },
   { timestamps: true }

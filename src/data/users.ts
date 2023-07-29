@@ -9,6 +9,7 @@ const users: IUser[] = [
     email: 'admin@example.com',
     password: hashSync('123456', genSaltSync(10)),
     role: 'admin',
+    is_verified: true,
   },
   {
     name: 'Developer',
@@ -16,6 +17,7 @@ const users: IUser[] = [
     email: 'admindev@example.com',
     password: hashSync('123456', genSaltSync(10)),
     role: 'admin',
+    is_verified: true,
   },
   {
     name: 'John Doe',
@@ -23,6 +25,7 @@ const users: IUser[] = [
     email: 'john@example.com',
     password: hashSync('123456', genSaltSync(10)),
     role: 'user',
+    is_verified: true,
   },
   {
     name: 'Jane doe',
@@ -30,6 +33,7 @@ const users: IUser[] = [
     email: 'jane@example.com',
     password: hashSync('123456', genSaltSync(10)),
     role: 'user',
+    is_verified: true,
   },
 ]
 
