@@ -1,5 +1,7 @@
 import mongoose, { Types } from 'mongoose'
 import { Request } from 'express'
+import { historyType } from '../../poin/model/poin.interface.js'
+import { statusTransaction } from '../../transaction/model/transaction.interface.js'
 
 export interface ICharity {
   title: string
@@ -34,5 +36,7 @@ export interface ICharityFundHistory {
   campaign_id?: Types.ObjectId | null
   transaction_id?: Types.ObjectId | null
   timestamp?: number
-  funding_status?: 'pending' | 'settled' | 'funded'
+  // funding_status?: 'pending' | 'settled' | 'funded'
+  funding_status?: statusTransaction
+  charity_history_type?: historyType
 }

@@ -99,7 +99,7 @@ app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/user', userRoutes)
 /* Charity router */
 app.use('/api/v1/charity', charityRoutes)
-app.use('/api/v1/charity-fund-history', charityFundHistoryRoutes)
+app.use('/api/v1/charity/funding-history', charityFundHistoryRoutes)
 
 /* Banner router */
 app.use('/api/v1/banner', bannerRoutes)
