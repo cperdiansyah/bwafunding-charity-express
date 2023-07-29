@@ -14,7 +14,7 @@ const poinHisorySchema: Schema<IPoinHistory> = new mongoose.Schema(
       required: [true, 'value is required'],
     },
     timestamp: {
-      type: Date || Number,
+      type: Number,
       required: [true, 'timestamp is required'],
     },
     history_type: {
@@ -24,6 +24,9 @@ const poinHisorySchema: Schema<IPoinHistory> = new mongoose.Schema(
   },
   { timestamps: true }
 )
-const PoinHistory = mongoose.model<IPoinHistory>('Poin_History', poinHisorySchema)
+const PoinHistory = mongoose.model<IPoinHistory>(
+  'Poin_History',
+  poinHisorySchema
+)
 
 export default PoinHistory

@@ -54,6 +54,7 @@ export const getPoinHistoryList = async (req: Request, res: Response) => {
 
     /* Get Point Data */
     const { _id: userId } = req.body.user //user data
+
     if (!userId) {
       return res.status(400).json({
         error: {
@@ -62,7 +63,9 @@ export const getPoinHistoryList = async (req: Request, res: Response) => {
         },
       })
     }
-    const poin: IPoin | null = await Poin.findOne({ id_user: userId })
+    const poin: IPoin | null = await Poin.findOne({ id_user: userId }).select(
+      '-__v'
+    )
     if (poin === null) {
       return res.status(404).json({
         error: {
@@ -78,23 +81,19 @@ export const getPoinHistoryList = async (req: Request, res: Response) => {
     }
     const totalCount = await PoinHistory.countDocuments(filter)
 
-    const pointHistory = await Poin.aggregate([
+    const pointHistory = await PoinHistory.aggregate([
       { $match: filter },
-      {
-        $lookup: {
-          from: 'poin_histories', // Use the actual name of your PoinHistory collection
-          localField: '_id',
-          foreignField: 'id_point',
-          as: 'poin_history',
-        },
-      },
       { $sort: { createdAt: -1 } },
       { $skip: (page - 1) * rows },
       { $limit: rows },
+      { $project: { __v: 0 } },
     ])
 
     return res.status(200).json({
-      data: pointHistory,
+      data: {
+        point: poin,
+        history: pointHistory,
+      },
       meta: {
         page,
         rows,

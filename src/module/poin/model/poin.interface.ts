@@ -13,7 +13,7 @@ export interface IPoinHistory {
   _id?: Types.ObjectId
   id_point?: Types.ObjectId | null
   value?: number
-  timestamp?: Date | number
+  timestamp?: number
   history_type?: historyType
 }
 
