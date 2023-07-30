@@ -72,7 +72,8 @@ export const login = async (req: Request, res: Response) => {
       { _id: userData.id },
       {
         refresh_token: refreshToken,
-      }
+      },
+      { new: true }
     )
     await clearCookie(req, res)
     res.cookie('refreshToken', refreshToken, cookiesOptions)
@@ -129,7 +130,9 @@ export const logout = async (req: Request, res: Response) => {
       { _id: user.id },
       {
         refresh_token: null,
-      }
+      },
+      { new: true }
+
     )
     await clearCookie(req, res)
     await session.commitTransaction()
@@ -203,6 +206,19 @@ export const register = async (req: Request, res: Response) => {
         Authorization: `Bearer ${accessToken ? accessToken : ''}`,
       },
     })
+
+    /* Create wallet */
+    await api.post(
+      `${SERVICE.Point}/create`,
+      {
+        userId: newUser._id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken ? accessToken : ''}`,
+        },
+      }
+    )
 
     await session.commitTransaction()
     session.endSession()

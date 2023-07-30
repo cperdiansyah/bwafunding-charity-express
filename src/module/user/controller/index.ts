@@ -28,7 +28,7 @@ export const getMe = async (req: Request, res: Response) => {
       return res.status(404).json({
         error: {
           code: 404,
-          message: 'Banner not found',
+          message: 'User not found',
         },
       })
     }

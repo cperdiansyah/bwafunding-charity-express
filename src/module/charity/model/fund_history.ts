@@ -23,6 +23,10 @@ const charityFundHistorySchema: Schema<ICharityFundHistory> =
         type: String,
         required: [true, 'funding_status is required'],
       },
+      history_type: {
+        type: String,
+        required: [true, 'funding_status is required'],
+      },
     },
     { timestamps: true }
   )

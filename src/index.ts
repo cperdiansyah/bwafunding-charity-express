@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import cors from 'cors'
 import path from 'path'
+import bp from 'body-parser'
 
 import {
   CORS_LOCAL,
@@ -25,6 +26,7 @@ import bannerRoutes from './module/banner/routes/index.js'
 import transactionRoutes from './module/transaction/routes/index.js'
 import approvalRoutes from './module/approval/routes/index.js'
 import userRoutes from './module/user/routes/index.js'
+import pointRoutes from './module/poin/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -37,6 +39,10 @@ app.use('/storage', express.static(uploadFolder))
 if (process.env.NODE_ENV?.trim() === 'development') {
   app.use(morgan('dev'))
 }
+
+/* Body parser */
+app.use(bp.json())
+app.use(bp.urlencoded({ extended: true }))
 
 const whitelist: string[] = [CORS_LOCAL, ...CORS_OPEN?.split(', ')]
 
@@ -93,7 +99,7 @@ app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/user', userRoutes)
 /* Charity router */
 app.use('/api/v1/charity', charityRoutes)
-app.use('/api/v1/charity-fund-history', charityFundHistoryRoutes)
+app.use('/api/v1/charity/funding-history', charityFundHistoryRoutes)
 
 /* Banner router */
 app.use('/api/v1/banner', bannerRoutes)
@@ -106,6 +112,9 @@ app.use('/api/v1/transaction', transactionRoutes)
 
 /* Approval routes */
 app.use('/api/v1/approval', approvalRoutes)
+
+/* Approval Point */
+app.use('/api/v1/point', pointRoutes)
 
 // Seeder route
 if (NODE_ENV?.trim() === 'development') {
