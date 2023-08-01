@@ -1,7 +1,6 @@
 import express from 'express'
 import {
   chargeTransaction,
-  chargeTransactionSedekahSubuh,
   checkStatus,
   gePaymentByIdCharity,
   getAllCharityPayment,
@@ -10,6 +9,7 @@ import {
   notificationPush,
 } from '../controller/index.js'
 import { verifyToken } from '../../../middleware/verifyToken.js'
+import { chargeTransactionSedekahSubuh } from '../controller/sedekahSubuh.js'
 
 // import { midtransWebhook, processTransaction } from '../controller/index.js'
 const router = express.Router()

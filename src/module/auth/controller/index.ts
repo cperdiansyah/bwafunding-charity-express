@@ -132,7 +132,6 @@ export const logout = async (req: Request, res: Response) => {
         refresh_token: null,
       },
       { new: true }
-
     )
     await clearCookie(req, res)
     await session.commitTransaction()
