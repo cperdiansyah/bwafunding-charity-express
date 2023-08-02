@@ -39,7 +39,11 @@ export const getAllCharityPayment = async (
     const { getAll, campaign_ids, transaction_type = 'campaign' } = req.query
     const query: any = {}
     if (req.query.status) {
-      query.status = req.query.status
+      if (req.query.status === 'settlement') {
+        query.status = { $in: [req.query.status, 'capture'] }
+      } else {
+        query.status = req.query.status
+      }
     }
     if (campaign_ids) {
       query.campaign_id = { $in: campaign_ids }
@@ -145,7 +149,11 @@ export const gePaymentByIdCharity = async (
       campaign_id: req.params.id,
     }
     if (req.query.status) {
-      query.status = req.query.status
+      if (req.query.status === 'settlement') {
+        query.status = { $in: [req.query.status, 'capture'] }
+      } else {
+        query.status = req.query.status
+      }
     }
     const totalCount = await Transaction.countDocuments(query)
 
@@ -212,6 +220,7 @@ export const getPaymentByIdUser = async (
     }
     if (req.query.status) {
       query.status = req.query.status
+      query.transaction_type = 'campaign'
     }
     const totalCount = await Transaction.countDocuments(query)
 
@@ -393,133 +402,6 @@ export const chargeTransaction = async (req: Request, res: Response) => {
     /* Create Charity Funding History */
     const dataCharityHistory: ICharityFundHistory = {
       campaign_id,
-      transaction_id: DataTransaction._id,
-      history_type: 'add',
-    }
-    await api.post(`${SERVICE.CharityHistory}/create`, dataCharityHistory, {
-      headers: {
-        Authorization: `${req?.headers.authorization}`,
-      },
-    })
-
-    await session.commitTransaction()
-    session.endSession()
-
-    return res.status(200).json({
-      status: 'success',
-      message: 'Payment campaign created successfully',
-      content: updatedTransaction,
-    })
-  } catch (error) {
-    console.log(error)
-    await session.abortTransaction()
-    session.endSession()
-    return errorHandler(error, res)
-  }
-}
-
-// desc charge transaction
-// @route GET /api/v1/transcation/charge/sedekah-subuh
-// @access Private
-export const chargeTransactionSedekahSubuh = async (
-  req: Request,
-  res: Response
-) => {
-  const session = await mongoose.startSession()
-  session.startTransaction()
-  try {
-    const {
-      user_id,
-      amount,
-      quantity = 1,
-      transaction_type = 'sedekah-subuh',
-    } = req.body
-    /* Check user and charity is exist */
-    const user = await User.findOne({
-      _id: user_id,
-    })
-    if (!user) {
-      return res.status(404).json({
-        error: {
-          code: 404,
-          message: 'User not found',
-        },
-      })
-    }
-
-    const sedekahSubuh = await Charity.findOne({
-      campaign_type: { $eq: 'sedekah-subuh' },
-    })
-
-    /* Check amount is noit 0 or is number */
-    if (amount === 0) {
-      return res.status(400).json({
-        error: {
-          code: 400,
-          message: 'amount must be greater than 0',
-        },
-      })
-    } else if (typeof amount !== 'number') {
-      return res.status(400).json({
-        error: {
-          code: 400,
-          message: 'amount must be in the form of a number',
-        },
-      })
-    }
-
-    /* Create Midtrans Payment */
-    const clientHost =
-      process.env.NODE_ENV?.trim() === 'development'
-        ? process.env.CORS_LOCAL
-        : process.env.CORS_OPEN
-
-    const dataPayment: ITransaction = {
-      user_id,
-      campaign_id: sedekahSubuh?._id,
-      quantity,
-      amount,
-      status: 'pending',
-      transaction_type,
-    }
-
-    /* Create payment campaign */
-    const DataTransaction = await Transaction.create(dataPayment)
-    const dataMidtransCharge = {
-      transaction_details: {
-        order_id: DataTransaction._id,
-        gross_amount: DataTransaction.amount,
-      },
-      customer_details: {
-        first_name: user.name.split(' ')[0],
-        last_name: user.name.split(' ')[1] || '',
-        email: user.email,
-      },
-      item_details: [
-        {
-          id: String(sedekahSubuh?._id),
-          price: DataTransaction.amount,
-          quantity: 1,
-          name: sedekahSubuh?.title,
-          url: `${clientHost}/campaign/${sedekahSubuh?.slug}`,
-        },
-      ],
-    }
-    const midtransCharge = await snap
-      .createTransaction(dataMidtransCharge)
-      .then((transaction) => {
-        return transaction
-      })
-
-    const updatedTransaction = await Transaction.findByIdAndUpdate(
-      DataTransaction.id,
-      { response_midtrans: midtransCharge },
-      { new: true }
-    )
-
-    /* Create Charity Funding History */
-    const dataCharityHistory: ICharityFundHistory = {
-      campaign_id: sedekahSubuh?._id,
       transaction_id: DataTransaction._id,
       history_type: 'add',
     }

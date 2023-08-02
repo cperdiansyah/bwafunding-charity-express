@@ -27,6 +27,7 @@ import transactionRoutes from './module/transaction/routes/index.js'
 import approvalRoutes from './module/approval/routes/index.js'
 import userRoutes from './module/user/routes/index.js'
 import pointRoutes from './module/poin/routes/index.js'
+import configRoutes from './module/config/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -45,7 +46,6 @@ app.use(bp.json())
 app.use(bp.urlencoded({ extended: true }))
 
 const whitelist: string[] = [CORS_LOCAL, ...CORS_OPEN?.split(', ')]
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true')
   res.header('Access-Control-Allow-Origin', '*')
@@ -113,13 +113,16 @@ app.use('/api/v1/transaction', transactionRoutes)
 /* Approval routes */
 app.use('/api/v1/approval', approvalRoutes)
 
-/* Approval Point */
+/* Point Routes */
 app.use('/api/v1/point', pointRoutes)
 
+/* Config Route */
+app.use('/api/v1/config', configRoutes)
+
 // Seeder route
-if (NODE_ENV?.trim() === 'development') {
-  app.use('/api/v1/seeder', seederRoutes)
-}
+// if (NODE_ENV?.trim() === 'development') {
+app.use('/api/v1/seeder', seederRoutes)
+// }
 
 app.listen(port, '0.0.0.0', () => {
   let log = `⚡️[server]: Server is running  ${process.env.NODE_ENV} mode on `
