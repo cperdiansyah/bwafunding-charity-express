@@ -19,6 +19,7 @@ import Approval from '../../approval/model/index.js'
 import CharityFundHistory from '../../charity/model/fund_history.js'
 import Transaction from '../../transaction/model/index.js'
 import ApprovalUser from '../../approval/model/approval_user.js'
+import Config from '../../config/model/index.js'
 
 export const importData = async (req: Request, res: Response) => {
   const session = await mongoose.startSession()
@@ -50,6 +51,8 @@ export const importData = async (req: Request, res: Response) => {
       ...banner,
       author: new Types.ObjectId(adminUser),
     }))
+
+    await Config.create({})
 
     if (!exclude?.includes('sedekah-subuh')) {
       /* Create Sedekah subuh campaign */
@@ -126,4 +129,5 @@ const destroy = async () => {
   await Transaction.deleteMany({})
   await Poin.deleteMany({})
   await PoinHistory.deleteMany({})
+  await Config.deleteMany({})
 }
