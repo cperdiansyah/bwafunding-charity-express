@@ -24,6 +24,7 @@ import charityFundHistoryRoutes from './module/charity/routes/fund_history.js'
 import mediaRoutes from './module/media/routes/index.js'
 import bannerRoutes from './module/banner/routes/index.js'
 import transactionRoutes from './module/transaction/routes/index.js'
+import sedekahSubuhRoutes from './module/transaction/routes/sedekah-subuh.js'
 import approvalRoutes from './module/approval/routes/index.js'
 import userRoutes from './module/user/routes/index.js'
 import pointRoutes from './module/poin/routes/index.js'
@@ -109,6 +110,8 @@ app.use('/api/v1/media', mediaRoutes)
 
 /* Payment Router */
 app.use('/api/v1/transaction', transactionRoutes)
+/* Payment Router Sedekah Subuh */
+app.use('/api/v1/transaction/sedekah-subuh', sedekahSubuhRoutes)
 
 /* Approval routes */
 app.use('/api/v1/approval', approvalRoutes)

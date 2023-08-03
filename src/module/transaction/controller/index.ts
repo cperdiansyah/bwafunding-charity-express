@@ -100,6 +100,7 @@ export const getAllCharityPayment = async (
       })
     }
   } catch (error) {
+    console.log(error)
     return errorHandler(error, res)
   }
 }

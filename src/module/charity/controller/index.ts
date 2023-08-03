@@ -33,13 +33,14 @@ export const getAllCharity = async (
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
+    const campaign_type = (req.query.campaign_type as string) || 'campaign'
     const onGoing = req.query.onGoing
 
     const status = (req.query.status as string) || 'accept' // get status from query params
 
     const filter: any = {
       end_date: { $gte: new Date() },
-      campaign_type: { $eq: 'campaign' },
+      campaign_type: { $eq: campaign_type },
     }
 
     if (status) {
@@ -165,6 +166,8 @@ export const getCharityBySlug = async (
     return errorHandler(error, res)
   }
 }
+
+
 
 // desc create charity
 // @route POST /api/v1/charity/
