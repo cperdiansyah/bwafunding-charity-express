@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
+import timezone from 'dayjs/plugin/timezone.js'
+
 import { MidtransClient } from 'midtrans-node-client'
 import dotenv from 'dotenv'
 
@@ -230,6 +234,58 @@ export const getSedekahSubuhPaymentByUserId = async (
         },
       })
     }
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
+export const checkSedekahSubuhPaymentByUserId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    dayjs.extend(utc)
+    dayjs.extend(timezone)
+    const userId = req.params.id
+    const now = dayjs().hour(0).minute(0).second(0)
+    // const now = dayjs().tz('Asia/Jakarta')
+    const today = now.toDate()
+    console.log(today)
+
+    const user = await User.findOne({ _id: userId })
+    if (!user) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'User not found',
+        },
+      })
+    }
+
+    /* Get Sedekah Subuh Campaign */
+    const sedekahSubuh = await Charity.findOne({
+      campaign_type: { $eq: 'sedekah-subuh' },
+    })
+
+    const query: any = {
+      transaction_type: { $eq: 'sedekah-subuh' },
+      campaign_id: { $eq: sedekahSubuh?._id },
+      user_id: { $in: [userId, new mongoose.Types.ObjectId(userId)] },
+      createdAt: {
+        $gte: today,
+        $lt: dayjs().add(1, 'd').toDate(),
+      },
+    }
+
+    const TrxSedekahSubuh = await Transaction.find(query)
+    const totalCount = await Transaction.countDocuments(query)
+    return res.status(200).json({
+      campaignPayment: TrxSedekahSubuh,
+      meta: {
+        total: totalCount,
+      },
+    })
   } catch (error) {
     return errorHandler(error, res)
   }
