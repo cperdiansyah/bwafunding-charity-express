@@ -37,7 +37,7 @@ export const getAllSedekahSubuhPayment = async (
   next: NextFunction
 ) => {
   try {
-    console.log(req.body.user)
+    // console.log(req.body.user)
     const sedekahSubuh = await Charity.findOne({
       campaign_type: { $eq: 'sedekah-subuh' },
     })
@@ -251,7 +251,7 @@ export const checkSedekahSubuhPaymentByUserId = async (
     const now = dayjs().hour(0).minute(0).second(0)
     // const now = dayjs().tz('Asia/Jakarta')
     const today = now.toDate()
-    console.log(today)
+    // console.log(today)
 
     const user = await User.findOne({ _id: userId })
     if (!user) {

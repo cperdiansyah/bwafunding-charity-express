@@ -16,4 +16,5 @@ export interface IUser {
 
 export interface IConfig {
   sedekahSubuhEnable: boolean
+  sedekahSubuhCanRepeat: boolean
 }

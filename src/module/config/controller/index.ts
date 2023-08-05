@@ -33,7 +33,7 @@ export const updateConfig = async (req: Request, res: Response) => {
   session.startTransaction()
 
   try {
-    const { sedekahSubuhEnable } = req.body
+    const { sedekahSubuhEnable, sedekahSubuhCanRepeat } = req.body
 
     if (sedekahSubuhEnable === undefined || !_isBoolean(sedekahSubuhEnable)) {
       return res.status(403).json({
@@ -46,6 +46,7 @@ export const updateConfig = async (req: Request, res: Response) => {
 
     const dataConfig: IConfig = {
       sedekahSubuhEnable,
+      sedekahSubuhCanRepeat,
     }
 
     // Update the config information
