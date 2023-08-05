@@ -29,6 +29,7 @@ import approvalRoutes from './module/approval/routes/index.js'
 import userRoutes from './module/user/routes/index.js'
 import pointRoutes from './module/poin/routes/index.js'
 import configRoutes from './module/config/routes/index.js'
+import rewardRoutes from './module/reward/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -121,6 +122,9 @@ app.use('/api/v1/point', pointRoutes)
 
 /* Config Route */
 app.use('/api/v1/config', configRoutes)
+
+/* Reward Route */
+app.use('/api/v1/reward', rewardRoutes)
 
 // Seeder route
 // if (NODE_ENV?.trim() === 'development') {
