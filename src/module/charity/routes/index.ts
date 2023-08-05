@@ -17,6 +17,7 @@ import {
   verifyAnonymousToken,
   verifyToken,
 } from '../../../middleware/verifyToken.js'
+import { getSedekahSubuhCampaign } from '../controller/sedekah-subuh.js'
 
 const router = express.Router()
 
@@ -26,6 +27,7 @@ const router = express.Router()
 router.route('/:id').get([verifyAnonymousToken], getCharityById)
 router.route('/slug/:id').get([verifyAnonymousToken], getCharityBySlug) */
 router.route('/').get(getAllCharity)
+router.route('/sedekah-subuh').get(getSedekahSubuhCampaign)
 router.route('/:id').get(getCharityById)
 router.route('/slug/:id').get(getCharityBySlug)
 
