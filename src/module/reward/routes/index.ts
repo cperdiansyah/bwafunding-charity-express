@@ -1,7 +1,12 @@
 import express from 'express'
 import { verifyToken } from '../../../middleware/verifyToken.js'
 import { adminAndUserVerifiedAccess } from '../../../middleware/authMiddleware.js'
-import { getRewardList } from '../controller/index.js'
+import {
+  createReward,
+  deleteReward,
+  getRewardList,
+  updateReward,
+} from '../controller/index.js'
 
 const router = express.Router()
 
@@ -9,15 +14,12 @@ const router = express.Router()
 router.route('/list').get(getRewardList)
 
 /* Post Route */
-// router.route('/create').post(createPoint)
+router.route('/create').post(createReward)
 
 /* Patch Route */
-// router.route('/update/user/:id').patch(updatePoin)
+router.route('/update/:id').patch(updateReward)
 
-// /* Patch Route */
-// router.route('/update/:id').patch([verifyToken], updateUser)
-// router
-//   .route('/update-status/:id')
-//   .patch([verifyToken, adminAndUserVerifiedAccess], updateStatusUser)
+/* Delete Route */
+router.route('/delete/:id').delete(deleteReward)
 
 export default router

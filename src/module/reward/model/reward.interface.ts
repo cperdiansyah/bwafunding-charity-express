@@ -6,6 +6,8 @@ export interface IReward {
   _id?: Types.ObjectId
   name: string
   price: number
+  image: string
+  deletedAt?:Date
   createdAt?: Date
   updatedAt?: Date
 }

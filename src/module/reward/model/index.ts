@@ -8,10 +8,18 @@ const rewardSchema: Schema<IReward> = new mongoose.Schema(
       type: String,
       required: [true, 'name is required'],
     },
+    image: {
+      type: String,
+      default: null,
+    },
     price: {
       type: Number,
-      required: [true, 'value is required'],
+      required: [true, 'price is required'],
       default: 0,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true }
