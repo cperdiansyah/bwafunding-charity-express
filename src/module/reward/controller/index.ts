@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
-import dayjs from 'dayjs'
 
 /* model */
-
-import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import Reward from '../model/index.js'
+import { errorHandler } from '../../../utils/helpers/errorHandler.js'
+/* Inferface */
 import { IReward } from '../model/reward.interface.js'
 
 // desc get point
@@ -15,15 +14,14 @@ export const getRewardList = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1
     const rows = parseInt(req.query.rows as string) || 10
-    const keyword = req.query.keyword || ''
-    // const showDeleted = req.query.showDeleted || false
-    const showDeleted = req.query.isDeleted === 'true' // make sure you get a boolean
+    const keyword = req.query.keyword
+    const showDeleted = req.query.showDeleted === 'true' // make sure you get a boolean
 
-    const filter: any = {
-      // name: `/.*${keyword}.*/`,
-      name: new RegExp(`/.*${keyword}.*/`, 'i'),
+    const filter: any = {}
+
+    if (keyword) {
+      filter.name = new RegExp(`/.*${keyword}.*/`, 'i')
     }
-
     if (!showDeleted) {
       filter.deletedAt = { $eq: null } // only not deleted rewards
     }
@@ -31,7 +29,7 @@ export const getRewardList = async (req: Request, res: Response) => {
     const totalCount = await Reward.countDocuments(filter)
     const totalPages = Math.ceil(totalCount / rows)
 
-    const reward: IReward[] = await Reward.find({})
+    const reward: IReward[] = await Reward.find(filter)
       .skip((page - 1) * rows)
       .limit(rows)
       .select('-__v')
