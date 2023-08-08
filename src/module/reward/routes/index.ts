@@ -6,6 +6,7 @@ import {
   deleteReward,
   getRewardList,
   updateReward,
+  uploadRewardMedia,
 } from '../controller/index.js'
 
 const router = express.Router()
@@ -15,6 +16,8 @@ router.route('/list').get(getRewardList)
 
 /* Post Route */
 router.route('/create').post(createReward)
+router.route('/upload').post(uploadRewardMedia)
+
 
 /* Patch Route */
 router.route('/update/:id').patch(updateReward)
