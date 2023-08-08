@@ -3,7 +3,6 @@ import mongoose from 'mongoose'
 import axios from 'axios'
 import fs from 'fs'
 
-
 import path from 'path'
 import { __dirname } from '../../../utils/index.js'
 import multer from 'multer'
@@ -49,6 +48,33 @@ export const getRewardList = async (req: Request, res: Response) => {
         totalPages,
         total: totalCount,
       },
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
+// @desc Fetch detail reward
+// @route GET /api/v1/reward/:id
+// @access Public
+export const getRewardById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const banner: IReward | null = await Reward.findById(req.params.id)
+    .select('-__v')
+    if (banner === null) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Reward not found',
+        },
+      })
+    }
+    return res.status(200).json({
+      banner,
     })
   } catch (error) {
     return errorHandler(error, res)
@@ -167,8 +193,6 @@ export const deleteReward = async (
     return errorHandler(error, res)
   }
 }
-
-
 
 export const uploadRewardMedia = async (
   req: Request,

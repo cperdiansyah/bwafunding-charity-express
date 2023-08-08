@@ -4,6 +4,7 @@ import { adminAndUserVerifiedAccess } from '../../../middleware/authMiddleware.j
 import {
   createReward,
   deleteReward,
+  getRewardById,
   getRewardList,
   updateReward,
   uploadRewardMedia,
@@ -13,6 +14,8 @@ const router = express.Router()
 
 /* Get Route */
 router.route('/list').get(getRewardList)
+router.route('/:id').get(getRewardById)
+
 
 /* Post Route */
 router.route('/create').post(createReward)
