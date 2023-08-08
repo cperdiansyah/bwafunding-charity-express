@@ -1,10 +1,17 @@
 import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
+import fs from 'fs'
+
+import path from 'path'
+import { __dirname } from '../../../utils/index.js'
+import multer from 'multer'
+
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import Banner from '../model/index.js'
 import { IBanner } from '../model/banner.interface.js'
 import { IApproval } from '../../approval/model/approval.interface.js'
 import { SERVICE, api } from '../../../utils/api.js'
+import axios from 'axios'
 
 // @desc Fetch all banners
 // @route GET /api/v1/banner
@@ -345,4 +352,61 @@ export const deleteBanner = async (
     session.endSession()
     return errorHandler(error, res)
   }
+}
+
+
+
+export const uploadBannermedia = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const relativeUploadLocation = 'storage/banner'
+  const uploadFolder = path.resolve(__dirname, relativeUploadLocation)
+
+  if (!fs.existsSync(uploadFolder)) {
+    fs.mkdirSync(uploadFolder, { recursive: true })
+  }
+
+  const upload = multer({ dest: relativeUploadLocation }).array('files')
+
+  upload(req, res, async function (error) {
+    try {
+      const urls = req.body.urls
+      // Array to store the uploaded file URLs
+      const uploadedUrls: string[] = []
+
+      for (const url of urls) {
+        // Download the file from the provided URL
+        const response = await axios.get(url, { responseType: 'arraybuffer' })
+        const rawFilename = response.request.path.split('/')
+
+        // Generate a unique filename for the uploaded file (optional)
+        const filename = `${Date.now()}-${rawFilename[rawFilename.length - 1]}`
+
+        // Write the downloaded file to the uploads folder
+        const filePath = `${relativeUploadLocation}/${filename}`
+
+        fs.writeFileSync(filePath, response.data)
+
+        // Store the uploaded file's URL
+        uploadedUrls.push(`${req.protocol}://${req.get('host')}/${filePath}`)
+      }
+      // Return the uploaded file URLs
+      res.json({ uploadedUrls })
+    } catch (error: any) {
+      const status = error.response.status
+      // console.error('Error uploading files:', error)
+
+      if (status === 404) {
+        return res.status(404).json({
+          error: {
+            code: 404,
+            message: 'Image Url not found',
+          },
+        })
+      }
+      return res.status(500).json({ error: 'Failed to upload files' })
+    }
+  })
 }
