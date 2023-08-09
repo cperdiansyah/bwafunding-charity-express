@@ -3,8 +3,8 @@ import mongoose from 'mongoose'
 import dayjs from 'dayjs'
 
 /* model */
-import Reward from '../../reward/model/index.js'
 import User from '../../user/model/index.js'
+import Reward from '../../reward/model/index.js'
 
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { IExchange } from '../model/exchange.interface.js'
