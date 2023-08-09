@@ -100,6 +100,7 @@ export const getAllCharityPayment = async (
       })
     }
   } catch (error) {
+    console.log(error)
     return errorHandler(error, res)
   }
 }
@@ -445,7 +446,8 @@ export const notificationPush = async (req: Request, res: Response) => {
     }
 
     // Extract the necessary information from the notification
-    const { transaction_status, order_id, gross_amount } = req.body
+    const { transaction_status, order_id, gross_amount, payment_type } =
+      req.body
 
     // Update the transaction status in the database
     const updatedTransaction = await Transaction.findOneAndUpdate(
@@ -467,7 +469,14 @@ export const notificationPush = async (req: Request, res: Response) => {
     const campaign = await Charity.findById(updatedTransaction?.campaign_id)
 
     /* Update point history */
-    if (campaign?.campaign_type === 'sedekah-subuh') {
+    if (
+      campaign?.campaign_type === 'sedekah-subuh' &&
+      (transaction_status === 'settlement' || transaction_status === 'capture')
+    ) {
+      if (transaction_status === 'settlement' && payment_type === 'credit_card')
+        return res
+          .status(200)
+          .send({ message: 'Credit card transaction settled.' })
       /* Add point */
       const dataPoint = {
         value: gross_amount * 0.05,

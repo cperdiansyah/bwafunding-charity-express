@@ -7,6 +7,7 @@ import {
   getBannerById,
   updateBanner,
   updateStatusBanner,
+  uploadBannermedia,
 } from '../controller/index.js'
 import {
   adminAccess,
@@ -35,5 +36,8 @@ router
 
 // Delete Router
 router.route('/:id').delete([verifyToken, adminAccess], deleteBanner)
+
+router.route('/upload').post(uploadBannermedia)
+
 
 export default router

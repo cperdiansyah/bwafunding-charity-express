@@ -9,6 +9,11 @@ const configSchema: Schema<IConfig> = new mongoose.Schema(
       required: [true, 'sedekahSubuhEnable is required'],
       default: false,
     },
+    sedekahSubuhCanRepeat: {
+      type: Boolean,
+      required: [true, 'sedekahSubuhCanRepeat is required'],
+      default: false,
+    },
   },
   { timestamps: true }
 )

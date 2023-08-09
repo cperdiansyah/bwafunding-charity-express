@@ -24,10 +24,13 @@ import charityFundHistoryRoutes from './module/charity/routes/fund_history.js'
 import mediaRoutes from './module/media/routes/index.js'
 import bannerRoutes from './module/banner/routes/index.js'
 import transactionRoutes from './module/transaction/routes/index.js'
+import sedekahSubuhRoutes from './module/transaction/routes/sedekah-subuh.js'
 import approvalRoutes from './module/approval/routes/index.js'
 import userRoutes from './module/user/routes/index.js'
 import pointRoutes from './module/poin/routes/index.js'
 import configRoutes from './module/config/routes/index.js'
+import rewardRoutes from './module/reward/routes/index.js'
+import exchangeRoutes from './module/exchange/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -109,6 +112,8 @@ app.use('/api/v1/media', mediaRoutes)
 
 /* Payment Router */
 app.use('/api/v1/transaction', transactionRoutes)
+/* Payment Router Sedekah Subuh */
+app.use('/api/v1/transaction/sedekah-subuh', sedekahSubuhRoutes)
 
 /* Approval routes */
 app.use('/api/v1/approval', approvalRoutes)
@@ -118,6 +123,12 @@ app.use('/api/v1/point', pointRoutes)
 
 /* Config Route */
 app.use('/api/v1/config', configRoutes)
+
+/* Reward Route */
+app.use('/api/v1/reward', rewardRoutes)
+
+/* Exchange Route */
+app.use('/api/v1/exchange', exchangeRoutes)
 
 // Seeder route
 // if (NODE_ENV?.trim() === 'development') {
