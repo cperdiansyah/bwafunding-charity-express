@@ -118,7 +118,17 @@ export const createExchangeRequest = async (
       status: 'pending',
     }
 
+    // Create exchange request
     await Exchange.create(dataExchangeRequest)
+
+    /* Handle subtract point user */
+
+    const dataPoint = {
+      value: reward.price,
+      type: 'subtract',
+    }
+
+    await api.patch(`${SERVICE.Point}/update/user/${user_id}`, dataPoint)
 
     await session.commitTransaction()
     session.endSession()
@@ -187,18 +197,18 @@ export const updateStatusExchange = async (
         .json({ message: 'No changes made to the approval' })
     }
 
+    const reward = await Reward.findById(existingExchange.reward_id)
+
     if (status === 'rejected') {
-      //  const dataPoint = {
-      //    value: gross_amount * 0.05,
-      //    type: 'add',
-      //  }
-      //  if (transaction_status === 'deny') {
-      //    dataPoint.type = 'subtract'
-      //  }
-      //  await api.patch(
-      //    `${SERVICE.Point}/update/user/${existingExchange?.user_id}`,
-      //    dataPoint
-      //  )
+      const dataPoint = {
+        value: reward?.price,
+        type: 'subtract',
+      }
+
+      await api.patch(
+        `${SERVICE.Point}/update/user/${existingExchange.user_id}`,
+        dataPoint
+      )
     }
 
     await session.commitTransaction()

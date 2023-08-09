@@ -4,6 +4,7 @@ import { adminAndUserVerifiedAccess } from '../../../middleware/authMiddleware.j
 import {
   createPoint,
   getPoinByUserId,
+  getPoinByUserIdSearch,
   getPoinHistoryList,
   updatePoin,
 } from '../controller/index.js'
@@ -13,6 +14,7 @@ const router = express.Router()
 /* Get Route */
 router.route('/me').get([verifyToken], getPoinByUserId)
 router.route('/history').get([verifyToken], getPoinHistoryList)
+router.route('/user/:id').get(getPoinByUserIdSearch)
 
 /* Post Route */
 router.route('/create').post([verifyToken], createPoint)
