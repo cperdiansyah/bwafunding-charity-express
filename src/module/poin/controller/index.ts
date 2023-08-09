@@ -44,6 +44,41 @@ export const getPoinByUserId = async (req: Request, res: Response) => {
   }
 }
 
+// desc get point
+// @route GET /api/v1/point/me
+// @access Private
+export const getPoinByUserIdSearch = async (req: Request, res: Response) => {
+  try {
+    const { _id: userId } = req.params //user data
+
+    if (!userId) {
+      return res.status(400).json({
+        error: {
+          code: 400,
+          message: 'Bad request',
+        },
+      })
+    }
+    const poin: IPoin | null = await Poin.findOne({ id_user: userId }).select(
+      '-__v'
+    )
+
+    if (poin === null) {
+      return res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Poin User not found',
+        },
+      })
+    }
+    return res.status(200).json({
+      poin,
+    })
+  } catch (error) {
+    return errorHandler(error, res)
+  }
+}
+
 // desc get point history
 // @route GET /api/v1/point/history
 // @access Private

@@ -2,25 +2,22 @@ import express from 'express'
 import { verifyToken } from '../../../middleware/verifyToken.js'
 import { adminAndUserVerifiedAccess } from '../../../middleware/authMiddleware.js'
 import {
-  createPoint,
-  getPoinByUserId,
-  getPoinByUserIdSearch,
-  getPoinHistoryList,
-  updatePoin,
+  createExchangeRequest,
+  getAllExchangeReward,
+  updateStatusExchange,
 } from '../controller/index.js'
 
 const router = express.Router()
 
 /* Get Route */
-router.route('/me').get([verifyToken], getPoinByUserId)
-router.route('/history').get([verifyToken], getPoinHistoryList)
-router.route('/user/:id').get(getPoinByUserIdSearch)
+// router.route('/me').get([verifyToken], getPoinByUserId)
+router.route('/list').get(getAllExchangeReward)
 
 /* Post Route */
-router.route('/create').post([verifyToken], createPoint)
+router.route('/create').post(createExchangeRequest)
 
 /* Patch Route */
-router.route('/update/user/:id').patch(updatePoin)
+router.route('/update/:id').patch(updateStatusExchange)
 
 // /* Patch Route */
 // router.route('/update/:id').patch([verifyToken], updateUser)
