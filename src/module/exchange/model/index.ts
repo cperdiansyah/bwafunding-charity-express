@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose'
-import { IExchange, IPoin } from './exchange.interface.js'
+import { IExchange } from './exchange.interface.js'
 
 // Define poin schema
 const exchangeSchema: Schema<IExchange> = new mongoose.Schema(
