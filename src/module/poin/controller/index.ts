@@ -49,7 +49,7 @@ export const getPoinByUserId = async (req: Request, res: Response) => {
 // @access Private
 export const getPoinByUserIdSearch = async (req: Request, res: Response) => {
   try {
-    const { _id: userId } = req.params //user data
+    const { id: userId } = req.params //user data
 
     if (!userId) {
       return res.status(400).json({

@@ -10,6 +10,7 @@ import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { IExchange } from '../model/exchange.interface.js'
 import Exchange from '../model/index.js'
 import { SERVICE, api } from '../../../utils/api.js'
+import { historyType } from '../../poin/model/poin.interface.js'
 
 // @desc Fetch all exchange reward
 // @route GET /api/v1/exchange/list
@@ -46,7 +47,7 @@ export const getAllExchangeReward = async (
     const totalPages = Math.ceil(totalCount / rows)
 
     const dataExchange: IExchange[] = await Exchange.find(filter)
-      .sort({ end_date: -1 })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * rows)
       .limit(rows)
       .populate({
@@ -156,7 +157,7 @@ export const updateStatusExchange = async (
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
-    const { _id: exchangeId } = req.params
+    const { id: exchangeId } = req.params
     const { status } = req.body
 
     if (!status) {
@@ -176,6 +177,7 @@ export const updateStatusExchange = async (
     }
 
     const existingExchange = await Exchange.findById(exchangeId)
+
     if (!existingExchange) {
       return res
         .status(404)
@@ -200,9 +202,12 @@ export const updateStatusExchange = async (
     const reward = await Reward.findById(existingExchange.reward_id)
 
     if (status === 'rejected') {
-      const dataPoint = {
-        value: reward?.price,
-        type: 'subtract',
+      const dataPoint: {
+        value: number
+        type: historyType
+      } = {
+        value: reward?.price || 0,
+        type: 'add',
       }
 
       await api.patch(
