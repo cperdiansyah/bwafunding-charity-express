@@ -10,6 +10,7 @@ import multer from 'multer'
 /* model */
 import Reward from '../model/index.js'
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
+
 /* Inferface */
 import { IReward } from '../model/reward.interface.js'
 

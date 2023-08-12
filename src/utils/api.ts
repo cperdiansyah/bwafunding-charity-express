@@ -10,6 +10,8 @@ export const SERVICE = {
   PaymentGeneral: '/api/v1/payment/general',
   PaymentCharity: '/api/v1/payment/charity',
 
+  Transaction: '/api/v1/transaction',
+
   // user
   User: '/api/v1/user',
   //approval
