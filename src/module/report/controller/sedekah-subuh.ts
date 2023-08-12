@@ -24,7 +24,7 @@ import {
 // desc get point
 // @route GET /api/v1/report/campaign/:id
 // @access Private
-export const previewCampaignReport = async (req: Request, res: Response) => {
+export const previewSedekahSubuhReport = async (req: Request, res: Response) => {
   try {
     /* Get Content Data */
     const campaign: ICharity | null = await Charity.findOne({
@@ -68,11 +68,7 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
     // Create a new page
     const page = await browser.newPage()
 
-    const cssFilePath = path.join(
-      __dirname,
-      'templates',
-      'reportSedekahSubuhStyles.css'
-    )
+    const cssFilePath = path.join(__dirname, 'templates', 'reportStyles.css')
     const styles = fs.readFileSync(cssFilePath, 'utf-8')
 
     // const imagePath = path.join(__dirname, 'templates', 'logo.jog')
@@ -99,7 +95,7 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
     const dateNow = formatDateToJakartaTime(dayjs().toDate())
 
     const renderedHTML = await ejs.renderFile(
-      path.join(__dirname, 'templates', 'report.-sedekah-subuh.ejs'),
+      path.join(__dirname, 'templates', 'report-sedekah-subuh.ejs'),
       {
         campaign: campaign,
         paymentData: dataPayment,
@@ -173,7 +169,7 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
 // desc get point
 // @route GET /api/v1/report/campaign/:id
 // @access Private
-export const generateCampaignReport = async (req: Request, res: Response) => {
+export const generateSedekahSubuhReport = async (req: Request, res: Response) => {
   try {
     const campaign: ICharity | null = await Charity.findOne({
       campaign_type: { $eq: 'sedekah-subuh' },
@@ -247,7 +243,7 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
     const dateNow = formatDateToJakartaTime(dayjs().toDate())
 
     const renderedHTML = await ejs.renderFile(
-      path.join(__dirname, 'templates', 'report.-sedekah-subuh.ejs'),
+      path.join(__dirname, 'templates', 'report-sedekah-subuh.ejs'),
       {
         campaign: campaign,
         paymentData: dataPayment,

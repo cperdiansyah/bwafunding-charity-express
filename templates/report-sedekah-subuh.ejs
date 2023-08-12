@@ -43,36 +43,21 @@
       <table class="table">
         <tbody>
           <tr>
-            <td class="table-title">Campaign Author</td>
-            <td class="table-content"><%= campaign.author.name %></td>
-          </tr>
-          <tr>
             <td class="table-title">Campaign Name</td>
             <td class="table-content"><%= campaign.title %></td>
           </tr>
-          <tr>
-            <td class="table-title">Campaign Status</td>
-            <td class="table-content"><%= status %></td>
-          </tr>
           <tr style="height: 23.5px">
-            <td class="table-title">Camapign Date</td>
-            <td class="table-content"><%= startDate %> s/d <%= endDate %></td>
-          </tr>
-          <tr>
-            <td class="table-title">Donation Target</td>
-            <td class="table-content"><%= donationTarget %></td>
-          </tr>
-          <tr>
-            <td class="table-title">Donaton Funded</td>
+            <td class="table-title">Sedekah Subuh Period</td>
             <td class="table-content">
-              <%= donationFunded %>
-              <span class="font-medium"
-                >(<%= percentage %>% of Donation Target</span
-              >)
+              <span class="donation date"><%= startDate %> s/d <%= endDate %></span>
             </td>
           </tr>
           <tr>
-            <td class="table-title">Total User Donation</td>
+            <td class="table-title">Sedekah Subuh Collected</td>
+            <td class="table-content"><%= donationFunded %></td>
+          </tr>
+          <tr>
+            <td class="table-title">Total User Sedekah</td>
             <td class="table-content"><%= paymentData.meta.total %> User</td>
           </tr>
         </tbody>
