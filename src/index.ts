@@ -31,6 +31,7 @@ import pointRoutes from './module/poin/routes/index.js'
 import configRoutes from './module/config/routes/index.js'
 import rewardRoutes from './module/reward/routes/index.js'
 import exchangeRoutes from './module/exchange/routes/index.js'
+import reportRoutes from './module/report/routes/index.js'
 
 const app: Express = express()
 dbConnect()
@@ -129,6 +130,9 @@ app.use('/api/v1/reward', rewardRoutes)
 
 /* Exchange Route */
 app.use('/api/v1/exchange', exchangeRoutes)
+
+/* Report Route */
+app.use('/api/v1/report', reportRoutes)
 
 // Seeder route
 // if (NODE_ENV?.trim() === 'development') {

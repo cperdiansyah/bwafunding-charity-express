@@ -58,9 +58,6 @@ export const getAllCharity = async (
       }
     }
 
-    // if (onGoing) {
-    //   filter.end_date = { $gte: new Date() }
-    // }
     if (
       req?.headers?.authorization &&
       req?.headers?.authorization?.length > 6
@@ -166,8 +163,6 @@ export const getCharityBySlug = async (
     return errorHandler(error, res)
   }
 }
-
-
 
 // desc create charity
 // @route POST /api/v1/charity/

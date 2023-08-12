@@ -50,7 +50,11 @@ export const getAllSedekahSubuhPayment = async (
 
     const query: any = {}
     if (req.query.status) {
-      query.status = req.query.status
+      if (req.query.status === 'settlement') {
+        query.status = { $in: [req.query.status, 'capture'] }
+      } else {
+        query.status = req.query.status
+      }
     }
     if (campaign_ids) {
       query.campaign_id = { $eq: campaign_ids }
@@ -63,6 +67,50 @@ export const getAllSedekahSubuhPayment = async (
 
     aggregateQuery.match(query)
 
+    // Lookup untuk campaign
+    aggregateQuery = aggregateQuery.lookup({
+      from: 'charity', // gantikan dengan nama koleksi campaign Anda
+      localField: 'campaign_id',
+      foreignField: '_id',
+      as: 'campaignData',
+    })
+
+    // Lookup untuk user
+    aggregateQuery = aggregateQuery.lookup({
+      from: 'users', // gantikan dengan nama koleksi user Anda
+      localField: 'user_id',
+      foreignField: '_id',
+      as: 'userData',
+    })
+
+    // Unwind akan mengubah array hasil lookup menjadi objek
+    aggregateQuery = aggregateQuery.unwind({
+      path: '$campaignData',
+      preserveNullAndEmptyArrays: true,
+    })
+    aggregateQuery = aggregateQuery.unwind({
+      path: '$userData',
+      preserveNullAndEmptyArrays: true,
+    })
+
+    aggregateQuery = aggregateQuery.project({
+      _id: 1,
+      campaign_id: 1,
+      user_id: 1,
+      amount: 1,
+      quantity: 1,
+      status: 1,
+      response_midtrans: 1,
+      transaction_type: 1,
+      createdAt: 1,
+      updatedAt: 1,
+      __v: 1,
+      campaignData: 1, // Jika Anda juga ingin memilih field tertentu dari campaignData, Anda bisa menambahkannya di sini
+      'userData._id': 1,
+      'userData.name': 1,
+      'userData.username': 1,
+      'userData.email': 1,
+    })
     const totalCount = await Transaction.countDocuments(query)
 
     if (!getAll) {
