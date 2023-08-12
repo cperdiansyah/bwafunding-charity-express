@@ -17,7 +17,8 @@ const router = express.Router()
 router.route('/list').get(getAllCharityPayment)
 router.route('/:id').get([verifyToken], getPaymentById)
 router.route('/user/:id').get([verifyToken], getPaymentByIdUser)
-router.route('/charity/:id').get([verifyToken], gePaymentByIdCharity)
+router.route('/charity/:id').get( gePaymentByIdCharity)
+// router.route('/charity/:id').get([verifyToken], gePaymentByIdCharity)
 router.route('/check-status/:id').get([verifyToken], checkStatus)
 
 /* post */
