@@ -269,8 +269,7 @@ export const generateSedekahSubuhReport = async (
       printBackground: true,
       format: 'A4',
       displayHeaderFooter: true,
-      headerTemplate:
-        "<div><div class='pageNumber'></div> <div>/</div><div class='totalPages'></div></div>",
+      headerTemplate: `<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span >${dateNow}</span></div>`,
       footerTemplate:
         '<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     })

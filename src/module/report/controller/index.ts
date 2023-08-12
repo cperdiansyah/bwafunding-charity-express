@@ -312,6 +312,7 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
         )
       }
     }
+    const dateNow = formatDateToJakartaTime(dayjs().toDate())
 
     const renderedHTML = await ejs.renderFile(
       path.join(__dirname, 'templates', 'report.ejs'),
@@ -325,6 +326,7 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
         donationTarget: currencyFormat(campaign.donation_target || 0),
         donationFunded: currencyFormat(amount || 0),
         percentage,
+        dateNow,
         // logoImagePath: imagePath,
       }
     )
@@ -340,8 +342,7 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
       printBackground: true,
       format: 'A4',
       displayHeaderFooter: true,
-      headerTemplate:
-        "<div><div class='pageNumber'></div> <div>/</div><div class='totalPages'></div></div>",
+      headerTemplate: `<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span >${dateNow}</span></div>`,
       footerTemplate:
         '<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     })
