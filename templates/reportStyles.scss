@@ -1,10 +1,4 @@
-/* .title{
-  font-size: 3rem;
-} */
-
 .header {
-  // display: flex;
-  // align-items: center;
   position: relative;
   img {
     height: 100px;
@@ -33,31 +27,35 @@
   margin-top: 3rem;
   line-height: 0;
   margin-bottom: 12px;
-  &-title {
-    font-size: 1.25rem;
-    font-weight: 500;
-    margin-bottom: 5px;
+
+  .campaign-header {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 2rem;
+
+    &-title {
+      line-height: 0;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    &-date {
+      font-size: 0.85rem;
+    }
   }
+
   .table {
     width: 100%;
     margin: 0;
-    // border-spacing: -10px;
-
-    // border: 1px solid #cfcfcf;
 
     &table,
     td {
       border: 1px solid #cfcfcf;
-      // border-collapse: collapse;
       height: 30px;
+      padding-left: 5px;
     }
 
     &-title {
-      // height: 23px;
-      // width: 222.5px;
-      // background-color: #d0e4f5;
-      // color: #fff;
       width: 50%;
       color: rgba(0, 0, 0, 0.65);
       background-color: rgba(0, 0, 0, 0.02);

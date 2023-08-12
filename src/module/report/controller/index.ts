@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import fs from 'fs'
 import ejs from 'ejs'
+import dayjs from 'dayjs'
 
 import path from 'path'
 import { __dirname } from '../../../utils/index.js'
@@ -12,7 +13,6 @@ import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { SERVICE, api } from '../../../utils/api.js'
 import { ICharity } from '../../charity/model/charityInterface.js'
 import Charity from '../../charity/model/index.js'
-import dayjs from 'dayjs'
 import { CAMPAIGN_STATUS_WITH_COLORS } from './campaign.js'
 
 function formatDateToJakartaTime(isoString: string | Date) {
@@ -144,6 +144,8 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
       }
     }
 
+    const dateNow = formatDateToJakartaTime(dayjs().toDate())
+
     const renderedHTML = await ejs.renderFile(
       path.join(__dirname, 'templates', 'report.ejs'),
       {
@@ -156,6 +158,7 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
         donationTarget: currencyFormat(campaign.donation_target || 0),
         donationFunded: currencyFormat(amount || 0),
         percentage,
+        dateNow,
         // logoImagePath: imagePath,
       }
     )
@@ -171,9 +174,9 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
       margin: { top: '60px', right: '50px', bottom: '60px', left: '50px' },
       printBackground: true,
       format: 'A4',
+
       displayHeaderFooter: true,
-      headerTemplate:
-        "<div><div class='pageNumber'></div> <div>/</div><div class='totalPages'></div></div>",
+      headerTemplate: `<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span >${dateNow}</span></div>`,
       footerTemplate:
         '<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     })
