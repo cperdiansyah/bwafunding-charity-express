@@ -12,6 +12,43 @@ import { errorHandler } from '../../../utils/helpers/errorHandler.js'
 import { SERVICE, api } from '../../../utils/api.js'
 import { ICharity } from '../../charity/model/charityInterface.js'
 import Charity from '../../charity/model/index.js'
+import dayjs from 'dayjs'
+import { CAMPAIGN_STATUS_WITH_COLORS } from './campaign.js'
+
+function formatDateToJakartaTime(isoString: string | Date) {
+  const dateInJakarta = new Date(isoString)
+
+  // Use Intl.DateTimeFormat to format the date
+  return new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Jakarta',
+  }).format(dateInJakarta)
+}
+
+function calculateTotalAmount(campaignPayment: any) {
+  let totalAmount = 0
+  for (let i = 0; i < campaignPayment.length; i++) {
+    const payment = campaignPayment[i]
+    totalAmount += payment.amount
+  }
+
+  return totalAmount
+}
+
+const currencyFormat = (money: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    currency: 'IDR',
+    style: 'currency',
+    minimumFractionDigits: 0,
+  }).format(money)
+}
+
+function calculateFunded(pledged: number, target: number) {
+  return Math.round((1 / (target / pledged)) * 100)
+}
 
 // desc get point
 // @route GET /api/v1/report/campaign/:id
@@ -83,12 +120,42 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
 
     // const imagePath = path.join(__dirname, 'templates', 'logo.jog')
 
+    const amount = calculateTotalAmount(dataPayment?.campaignPayment)
+
+    const percentage = calculateFunded(
+      amount || 0,
+      campaign?.donation_target || 0
+    )
+
+    const status = campaign?.status
+    const end_date = campaign?.end_date
+
+    const isCampaignStillRunning = dayjs(end_date) > dayjs()
+
+    let campaignStatus = CAMPAIGN_STATUS_WITH_COLORS.find(
+      (item) => item.label === status
+    )
+
+    if (campaignStatus) {
+      if (!isCampaignStillRunning) {
+        campaignStatus = CAMPAIGN_STATUS_WITH_COLORS.find(
+          (item) => item.label === 'completed'
+        )
+      }
+    }
+
     const renderedHTML = await ejs.renderFile(
       path.join(__dirname, 'templates', 'report.ejs'),
       {
         campaign: campaign,
         paymentData: dataPayment,
         styles: styles,
+        status: campaignStatus?.status,
+        startDate: formatDateToJakartaTime(campaign?.start_date),
+        endDate: formatDateToJakartaTime(campaign?.end_date || ''),
+        donationTarget: currencyFormat(campaign.donation_target || 0),
+        donationFunded: currencyFormat(amount || 0),
+        percentage,
         // logoImagePath: imagePath,
       }
     )
@@ -104,6 +171,11 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
       margin: { top: '60px', right: '50px', bottom: '60px', left: '50px' },
       printBackground: true,
       format: 'A4',
+      displayHeaderFooter: true,
+      headerTemplate:
+        "<div><div class='pageNumber'></div> <div>/</div><div class='totalPages'></div></div>",
+      footerTemplate:
+        '<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     })
 
     const pdfName = `report-${Date.now()}.pdf`
@@ -214,12 +286,42 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
     const styles = fs.readFileSync(cssFilePath, 'utf-8')
     // const imagePath = path.join(__dirname, 'templates', 'logo.png')
 
+    const amount = calculateTotalAmount(dataPayment?.campaignPayment)
+
+    const percentage = calculateFunded(
+      amount || 0,
+      campaign?.donation_target || 0
+    )
+
+    const status = campaign?.status
+    const end_date = campaign?.end_date
+
+    const isCampaignStillRunning = dayjs(end_date) > dayjs()
+
+    let campaignStatus = CAMPAIGN_STATUS_WITH_COLORS.find(
+      (item) => item.label === status
+    )
+
+    if (campaignStatus) {
+      if (!isCampaignStillRunning) {
+        campaignStatus = CAMPAIGN_STATUS_WITH_COLORS.find(
+          (item) => item.label === 'completed'
+        )
+      }
+    }
+
     const renderedHTML = await ejs.renderFile(
       path.join(__dirname, 'templates', 'report.ejs'),
       {
         campaign: campaign,
         paymentData: dataPayment,
         styles: styles,
+        status: campaignStatus?.status,
+        startDate: formatDateToJakartaTime(campaign?.start_date),
+        endDate: formatDateToJakartaTime(campaign?.end_date || ''),
+        donationTarget: currencyFormat(campaign.donation_target || 0),
+        donationFunded: currencyFormat(amount || 0),
+        percentage,
         // logoImagePath: imagePath,
       }
     )
@@ -234,6 +336,11 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
       margin: { top: '60px', right: '50px', bottom: '60px', left: '50px' },
       printBackground: true,
       format: 'A4',
+      displayHeaderFooter: true,
+      headerTemplate:
+        "<div><div class='pageNumber'></div> <div>/</div><div class='totalPages'></div></div>",
+      footerTemplate:
+        '<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     })
 
     const pdfName = `report-${Date.now()}.pdf`
