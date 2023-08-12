@@ -1,0 +1,23 @@
+/* .title{
+  font-size: 3rem;
+} */
+
+.header {
+  // display: flex;
+  // align-items: center;
+  position: relative;
+  img {
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    position: absolute;
+  }
+
+  &-title {
+    &-wrapper {
+      text-align: center;
+    }
+    font-size: 2rem;
+    font-weight: 400;
+  }
+}

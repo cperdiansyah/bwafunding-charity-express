@@ -81,12 +81,19 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
     const cssFilePath = path.join(__dirname, 'templates', 'reportStyles.css')
     const styles = fs.readFileSync(cssFilePath, 'utf-8')
 
+    // const imagePath = path.join(__dirname, 'templates', 'logo.jog')
+
     const renderedHTML = await ejs.renderFile(
       path.join(__dirname, 'templates', 'report.ejs'),
-      { campaign: campaign, paymentData: dataPayment, styles: styles }
+      {
+        campaign: campaign,
+        paymentData: dataPayment,
+        styles: styles,
+        // logoImagePath: imagePath,
+      }
     )
 
-    await page.setContent(renderedHTML, { waitUntil: 'domcontentloaded' })
+    await page.setContent(renderedHTML, { waitUntil: 'networkidle0' })
 
     // To reflect CSS used for screens instead of print
     await page.emulateMediaType('screen')
@@ -94,7 +101,7 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
     // Downlaod the PDF
     const pdfBuffer = await page.pdf({
       // path: 'result.pdf',
-      margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
+      margin: { top: '60px', right: '50px', bottom: '60px', left: '50px' },
       printBackground: true,
       format: 'A4',
     })
@@ -203,36 +210,30 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
     // Create a new page
     const page = await browser.newPage()
 
-    //Get HTML content from HTML file
-    // const html = fs.readFileSync('index.html', 'utf-8')
-    // console.log(html)
-
-    // const htmlFilePath = path.join(__dirname, 'templates', 'report.html')
-    // const contentHTML = fs.readFileSync(htmlFilePath, 'utf-8')
     const cssFilePath = path.join(__dirname, 'templates', 'reportStyles.css')
     const styles = fs.readFileSync(cssFilePath, 'utf-8')
+    // const imagePath = path.join(__dirname, 'templates', 'logo.png')
 
     const renderedHTML = await ejs.renderFile(
       path.join(__dirname, 'templates', 'report.ejs'),
-      { campaign: campaign, paymentData: dataPayment, styles: styles }
+      {
+        campaign: campaign,
+        paymentData: dataPayment,
+        styles: styles,
+        // logoImagePath: imagePath,
+      }
     )
 
-    await page.setContent(renderedHTML, { waitUntil: 'domcontentloaded' })
+    await page.setContent(renderedHTML, { waitUntil: 'networkidle0' })
 
     // To reflect CSS used for screens instead of print
     await page.emulateMediaType('screen')
 
     // Downlaod the PDF
     const pdfBuffer = await page.pdf({
-      // path: 'result.pdf',
-      margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
+      margin: { top: '60px', right: '50px', bottom: '60px', left: '50px' },
       printBackground: true,
       format: 'A4',
-      // displayHeaderFooter: true,
-      // headerTemplate:
-      //   "<div><div class='pageNumber'></div> <div>/</div><div class='totalPages'></div></div>",
-      // footerTemplate:
-      //   '<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     })
 
     const pdfName = `report-${Date.now()}.pdf`
