@@ -1,7 +1,7 @@
 import express from 'express'
 import { verifyToken } from '../../../middleware/verifyToken.js'
 import { adminAndUserVerifiedAccess } from '../../../middleware/authMiddleware.js'
-import { generateCampaignReport } from '../controller/index.js'
+import { generateCampaignReport, previewCampaignReport } from '../controller/index.js'
 
 const router = express.Router()
 
@@ -10,6 +10,8 @@ const router = express.Router()
 router
   .route('/campaign/:id')
   .get([verifyToken, adminAndUserVerifiedAccess], generateCampaignReport)
+
+router.route('/preview-campaign/:id').get(previewCampaignReport)
 // router.route('/list').get(getRewardList)
 // router.route('/:id').get(getRewardById)
 
