@@ -14,79 +14,32 @@ import { SERVICE, api } from '../../../utils/api.js'
 import { ICharity } from '../../charity/model/charityInterface.js'
 import Charity from '../../charity/model/index.js'
 import { CAMPAIGN_STATUS_WITH_COLORS } from './campaign.js'
-
-export function formatDateToJakartaTime(isoString: string | Date) {
-  const dateInJakarta = new Date(isoString)
-
-  // Use Intl.DateTimeFormat to format the date
-  return new Intl.DateTimeFormat('id-ID', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'Asia/Jakarta',
-  }).format(dateInJakarta)
-}
-
-export function calculateTotalAmount(campaignPayment: any) {
-  let totalAmount = 0
-  for (let i = 0; i < campaignPayment.length; i++) {
-    const payment = campaignPayment[i]
-    totalAmount += payment.amount
-  }
-
-  return totalAmount
-}
-
-export const currencyFormat = (money: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    currency: 'IDR',
-    style: 'currency',
-    minimumFractionDigits: 0,
-  }).format(money)
-}
-
-export function calculateFunded(pledged: number, target: number) {
-  return Math.round((1 / (target / pledged)) * 100)
-}
+import {
+  calculateFunded,
+  calculateTotalAmount,
+  currencyFormat,
+  formatDateToJakartaTime,
+} from './index.js'
 
 // desc get point
 // @route GET /api/v1/report/campaign/:id
 // @access Private
 export const previewCampaignReport = async (req: Request, res: Response) => {
   try {
-    const idCampaign = req.params.id
-    if (idCampaign === null) {
-      return res.status(400).json({
-        error: {
-          code: 400,
-          message: 'Id Campaign requeired',
-        },
-      })
-    }
-
     /* Get Content Data */
-
-    const campaign: ICharity | null = await Charity.findById(idCampaign)
+    const campaign: ICharity | null = await Charity.findOne({
+      campaign_type: { $eq: 'sedekah-subuh' },
+    })
       .populate({
         path: 'author',
         select: 'name',
       })
       .select('-__v')
-    if (campaign === null) {
-      return res.status(404).json({
-        error: {
-          code: 404,
-          message: 'Charity not found',
-        },
-      })
-    }
+
     const getPaymentData = await api.get(
-      `${SERVICE.Transaction}/charity/${idCampaign}`,
+      `${SERVICE.Transaction}/sedekah-subuh/list`,
       {
         params: {
-          page: 1,
-          rows: 1000,
           getAll: true,
           status: 'settlement',
         },
@@ -98,7 +51,7 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
     const dataPayment = getPaymentData.data
 
     /* Prepare uploaded document */
-    const relativeUploadLocation = 'storage/report/campaign/preview'
+    const relativeUploadLocation = 'storage/report/sedekah-subuh/preview'
     const uploadFolder = path.resolve(__dirname, relativeUploadLocation)
 
     if (!fs.existsSync(uploadFolder)) {
@@ -115,17 +68,16 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
     // Create a new page
     const page = await browser.newPage()
 
-    const cssFilePath = path.join(__dirname, 'templates', 'reportStyles.css')
+    const cssFilePath = path.join(
+      __dirname,
+      'templates',
+      'reportSedekahSubuhStyles.css'
+    )
     const styles = fs.readFileSync(cssFilePath, 'utf-8')
 
     // const imagePath = path.join(__dirname, 'templates', 'logo.jog')
 
     const amount = calculateTotalAmount(dataPayment?.campaignPayment)
-
-    const percentage = calculateFunded(
-      amount || 0,
-      campaign?.donation_target || 0
-    )
 
     const status = campaign?.status
     const end_date = campaign?.end_date
@@ -147,17 +99,15 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
     const dateNow = formatDateToJakartaTime(dayjs().toDate())
 
     const renderedHTML = await ejs.renderFile(
-      path.join(__dirname, 'templates', 'report.ejs'),
+      path.join(__dirname, 'templates', 'report.-sedekah-subuh.ejs'),
       {
         campaign: campaign,
         paymentData: dataPayment,
         styles: styles,
         status: campaignStatus?.status,
-        startDate: formatDateToJakartaTime(campaign?.start_date),
-        endDate: formatDateToJakartaTime(campaign?.end_date || ''),
-        donationTarget: currencyFormat(campaign.donation_target || 0),
+        startDate: formatDateToJakartaTime(campaign?.start_date || ''),
+        endDate: formatDateToJakartaTime(dayjs().toDate()),
         donationFunded: currencyFormat(amount || 0),
-        percentage,
         dateNow,
         // logoImagePath: imagePath,
       }
@@ -181,7 +131,7 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
         '<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     })
 
-    const pdfName = `report-campaign-${Date.now()}.pdf`
+    const pdfName = `report-sedekah-subuh-${Date.now()}.pdf`
 
     // Write the downloaded file to the uploads folder
     const filePath = `${relativeUploadLocation}/${pdfName}`
@@ -203,7 +153,7 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
       res.setHeader('Content-Type', 'application/pdf')
       res.setHeader(
         'Content-Disposition',
-        'inline; filename=report-1691841871982.pdf'
+        'inline; filename=report-sedekah-subuh-1691841871982.pdf'
       )
 
       // Gunakan streaming untuk mengirimkan konten PDF ke browser
@@ -225,38 +175,19 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
 // @access Private
 export const generateCampaignReport = async (req: Request, res: Response) => {
   try {
-    const idCampaign = req.params.id
-    if (idCampaign === null) {
-      return res.status(400).json({
-        error: {
-          code: 400,
-          message: 'Id Campaign requeired',
-        },
-      })
-    }
-
-    /* Get Content Data */
-
-    const campaign: ICharity | null = await Charity.findById(idCampaign)
+    const campaign: ICharity | null = await Charity.findOne({
+      campaign_type: { $eq: 'sedekah-subuh' },
+    })
       .populate({
         path: 'author',
         select: 'name',
       })
       .select('-__v')
-    if (campaign === null) {
-      return res.status(404).json({
-        error: {
-          code: 404,
-          message: 'Charity not found',
-        },
-      })
-    }
+
     const getPaymentData = await api.get(
-      `${SERVICE.Transaction}/charity/${idCampaign}`,
+      `${SERVICE.Transaction}/sedekah-subuh/list`,
       {
         params: {
-          page: 1,
-          rows: 1000,
           getAll: true,
           status: 'settlement',
         },
@@ -268,7 +199,7 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
     const dataPayment = getPaymentData.data
 
     /* Prepare uploaded document */
-    const relativeUploadLocation = 'storage/report/campaign'
+    const relativeUploadLocation = 'storage/report/sedekah-subuh'
     const uploadFolder = path.resolve(__dirname, relativeUploadLocation)
 
     if (!fs.existsSync(uploadFolder)) {
@@ -285,16 +216,16 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
     // Create a new page
     const page = await browser.newPage()
 
-    const cssFilePath = path.join(__dirname, 'templates', 'reportStyles.css')
+    const cssFilePath = path.join(
+      __dirname,
+      'templates',
+      'reportSedekahSubuhStyles.css'
+    )
     const styles = fs.readFileSync(cssFilePath, 'utf-8')
-    // const imagePath = path.join(__dirname, 'templates', 'logo.png')
+
+    // const imagePath = path.join(__dirname, 'templates', 'logo.jog')
 
     const amount = calculateTotalAmount(dataPayment?.campaignPayment)
-
-    const percentage = calculateFunded(
-      amount || 0,
-      campaign?.donation_target || 0
-    )
 
     const status = campaign?.status
     const end_date = campaign?.end_date
@@ -313,18 +244,19 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
       }
     }
 
+    const dateNow = formatDateToJakartaTime(dayjs().toDate())
+
     const renderedHTML = await ejs.renderFile(
-      path.join(__dirname, 'templates', 'report.ejs'),
+      path.join(__dirname, 'templates', 'report.-sedekah-subuh.ejs'),
       {
         campaign: campaign,
         paymentData: dataPayment,
         styles: styles,
         status: campaignStatus?.status,
-        startDate: formatDateToJakartaTime(campaign?.start_date),
-        endDate: formatDateToJakartaTime(campaign?.end_date || ''),
-        donationTarget: currencyFormat(campaign.donation_target || 0),
+        startDate: formatDateToJakartaTime(campaign?.start_date || ''),
+        endDate: formatDateToJakartaTime(dayjs().toDate()),
         donationFunded: currencyFormat(amount || 0),
-        percentage,
+        dateNow,
         // logoImagePath: imagePath,
       }
     )
@@ -346,7 +278,7 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
         '<div style="text-align: right;width: 297mm;font-size: 8px;"><span style="margin-right: 1cm"><span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     })
 
-    const pdfName = `report-campaign-${Date.now()}.pdf`
+    const pdfName = `report-${Date.now()}.pdf`
 
     // Write the downloaded file to the uploads folder
     const filePath = `${relativeUploadLocation}/${pdfName}`
