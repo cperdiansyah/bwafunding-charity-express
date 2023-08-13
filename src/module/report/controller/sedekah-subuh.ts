@@ -7,6 +7,7 @@ import path from 'path'
 import { __dirname } from '../../../utils/index.js'
 
 import puppeteer from 'puppeteer'
+import PCR from 'puppeteer-chromium-resolver'
 
 /* Utils */
 import { errorHandler } from '../../../utils/helpers/errorHandler.js'
@@ -61,12 +62,15 @@ export const previewSedekahSubuhReport = async (
     }
 
     /* Generate PDF Document*/
+    const options = {}
+    const stats = await PCR(options)
 
     // Create a browser instance
-    const browser = await puppeteer.launch({
+    const browser = await stats.puppeteer.launch({
       headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       ignoreDefaultArgs: ['--disable-extensions'],
+      executablePath: stats.executablePath,
     })
 
     // Create a new page
@@ -210,12 +214,15 @@ export const generateSedekahSubuhReport = async (
     }
 
     /* Generate PDF Document*/
+    const options = {}
+    const stats = await PCR(options)
 
     // Create a browser instance
-    const browser = await puppeteer.launch({
+    const browser = await stats.puppeteer.launch({
       headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       ignoreDefaultArgs: ['--disable-extensions'],
+      executablePath: stats.executablePath,
     })
 
     // Create a new page

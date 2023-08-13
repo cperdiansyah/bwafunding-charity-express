@@ -37,6 +37,7 @@
     "nanoid": "^4.0.2",
     "nodemailer": "^6.9.4",
     "puppeteer": "^21.0.3",
+    "puppeteer-chromium-resolver": "^20.0.0",
     "sequelize": "^6.31.1",
     "sharp": "^0.32.1"
   },
