@@ -64,7 +64,9 @@ export const previewSedekahSubuhReport = async (
 
     // Create a browser instance
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      ignoreDefaultArgs: ['--disable-extensions'],
     })
 
     // Create a new page
@@ -211,7 +213,9 @@ export const generateSedekahSubuhReport = async (
 
     // Create a browser instance
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      ignoreDefaultArgs: ['--disable-extensions'],
     })
 
     // Create a new page
