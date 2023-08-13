@@ -109,7 +109,9 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
 
     // Create a browser instance
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      ignoreDefaultArgs: ['--disable-extensions'],
     })
 
     // Create a new page
@@ -280,7 +282,8 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
     // Create a browser instance
     const browser = await puppeteer.launch({
       headless: false,
-      args: ['--no-sandbox'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      ignoreDefaultArgs: ['--disable-extensions'],
     })
 
     // Create a new page
