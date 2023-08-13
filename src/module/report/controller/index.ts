@@ -279,7 +279,8 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
 
     // Create a browser instance
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
+      args: ['--no-sandbox'],
     })
 
     // Create a new page
