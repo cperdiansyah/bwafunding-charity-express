@@ -7,6 +7,7 @@ import path from 'path'
 import { __dirname } from '../../../utils/index.js'
 
 import puppeteer from 'puppeteer'
+// import puppeteer from 'puppeteer-core'
 import PCR from 'puppeteer-chromium-resolver'
 
 /* Utils */
@@ -111,11 +112,11 @@ export const previewCampaignReport = async (req: Request, res: Response) => {
     const stats = await PCR(options)
 
     // Create a browser instance
-    const browser = await stats.puppeteer.launch({
-      headless: false,
+    const browser = await puppeteer.launch({
+      headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       ignoreDefaultArgs: ['--disable-extensions'],
-      executablePath: stats.executablePath,
+      // executablePath: '/usr/bin/chromium-browser',
     })
 
     // Create a new page
@@ -282,16 +283,15 @@ export const generateCampaignReport = async (req: Request, res: Response) => {
     }
 
     /* Generate PDF Document*/
-     const options = {}
-     const stats = await PCR(options)
-
+    const options = {}
+    const stats = await PCR(options)
 
     // Create a browser instance
-    const browser = await stats.puppeteer.launch({
-      headless: false,
+    const browser = await puppeteer.launch({
+      headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       ignoreDefaultArgs: ['--disable-extensions'],
-      executablePath: stats.executablePath,
+      // executablePath: '/usr/bin/chromium-browser',
     })
 
     // Create a new page
