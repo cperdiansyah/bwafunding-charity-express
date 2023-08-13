@@ -8,6 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist",
+    "noImplicitAny": false,
     // "baseUrl": "./src",
     "baseUrl": "./node_modules",
     "rootDir": "./src",
